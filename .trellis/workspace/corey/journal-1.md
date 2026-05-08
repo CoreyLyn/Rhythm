@@ -39,3 +39,36 @@ Brainstorm + 实现 Rhythm v1：WPF + .NET 10 + 模式 C 桌面固定 (HWND_BOTT
 ### Next Steps
 
 - None - task complete
+
+
+## Session 2: Rhythm UI 移除顶部栏并优化交互
+
+**Date**: 2026-05-08
+**Task**: Rhythm UI 移除顶部栏并优化交互
+**Branch**: `master`
+
+### Summary
+
+去掉主窗口 Rhythm 标题/日期/编辑/关闭按钮，编辑事项与隐藏窗口改由窗口右键菜单 + 托盘菜单触发，Esc 也可隐藏。列表字号 13→14、行间距 5→7，删除三处孤儿样式。net -89/+51。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `865f4cb` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
