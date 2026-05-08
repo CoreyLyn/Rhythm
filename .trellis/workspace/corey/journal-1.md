@@ -138,3 +138,36 @@ Brainstorm + 实现 Rhythm v1：WPF + .NET 10 + 模式 C 桌面固定 (HWND_BOTT
 ### Next Steps
 
 - None - task complete
+
+
+## Session 5: Release 自动化：tag 触发 GitHub Releases
+
+**Date**: 2026-05-08
+**Task**: Release 自动化：tag 触发 GitHub Releases
+**Branch**: `master`
+
+### Summary
+
+创建 .github/workflows/release.yml，实现 tag push 自动构建 exe 并发布
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b76e697` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
