@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Rhythm.State;
@@ -15,6 +16,14 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public bool HasItems => Items.Count > 0;
 
+    public string CurrentDate => DateTime.Now.ToString("M月d日 dddd", CultureInfo.GetCultureInfo("zh-CN"));
+
+    public int CompletedCount => Items.Count(i => i.IsCompleted);
+
+    public int TotalCount => Items.Count;
+
+    public string ProgressText => TotalCount > 0 ? $"已完成 {CompletedCount}/{TotalCount}" : "暂无任务";
+
     public WindowPos? WindowPos => _service.State.WindowPos;
 
     public MainViewModel(RhythmStateService service)
@@ -23,7 +32,26 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _service = service;
         Items = new ObservableCollection<ItemViewModel>(
             _service.State.Items.Select(i => new ItemViewModel(_service, i)));
-        Items.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasItems));
+        Items.CollectionChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(HasItems));
+            OnPropertyChanged(nameof(CompletedCount));
+            OnPropertyChanged(nameof(TotalCount));
+            OnPropertyChanged(nameof(ProgressText));
+        };
+
+        // Subscribe to item completion changes
+        foreach (var item in Items)
+            item.PropertyChanged += OnItemPropertyChanged;
+    }
+
+    private void OnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ItemViewModel.IsCompleted))
+        {
+            OnPropertyChanged(nameof(CompletedCount));
+            OnPropertyChanged(nameof(ProgressText));
+        }
     }
 
     public void UpdateWindowPos(WindowPos pos) => _service.State.SetWindowPos(pos);
@@ -34,6 +62,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     {
         var item = _service.State.AddItem(text);
         var vm = new ItemViewModel(_service, item);
+        vm.PropertyChanged += OnItemPropertyChanged;
         Items.Add(vm);
         _service.Persist();
         return vm;
@@ -52,7 +81,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
         if (idx < 0) return;
         _service.State.RenameItem(itemVm.Id, newText);
         var renamed = _service.State.Items[idx];
-        Items[idx] = new ItemViewModel(_service, renamed);
+        itemVm.PropertyChanged -= OnItemPropertyChanged;
+        var newVm = new ItemViewModel(_service, renamed);
+        newVm.PropertyChanged += OnItemPropertyChanged;
+        Items[idx] = newVm;
         _service.Persist();
     }
 
@@ -74,9 +106,19 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
         _service.Persist();
         var snapshot = _service.State.Items.ToArray();
+
+        foreach (var item in Items)
+            item.PropertyChanged -= OnItemPropertyChanged;
+
         Items.Clear();
         foreach (var item in snapshot)
-            Items.Add(new ItemViewModel(_service, item));
+        {
+            var vm = new ItemViewModel(_service, item);
+            vm.PropertyChanged += OnItemPropertyChanged;
+            Items.Add(vm);
+        }
+
+        OnPropertyChanged(nameof(CurrentDate));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

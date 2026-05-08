@@ -29,22 +29,43 @@
         </Border.ContextMenu>
 
         <Grid>
-            <ItemsControl ItemsSource="{Binding Items}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox Style="{StaticResource ItemCheckBoxStyle}"
-                                  IsChecked="{Binding IsCompleted, Mode=TwoWay}">
-                            <CheckBox.Content>
-                                <TextBlock Text="{Binding Text}" Style="{StaticResource ItemTextStyle}"/>
-                            </CheckBox.Content>
-                        </CheckBox>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <TextBlock Style="{StaticResource EmptyHintStyle}"
-                       Text="今天没有事项"
-                       Visibility="{Binding HasItems, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+            <!-- Header Section -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                <TextBlock Text="{Binding CurrentDate}" Style="{StaticResource HeaderDateStyle}"/>
+                <TextBlock Text="{Binding ProgressText}" Style="{StaticResource HeaderStatsStyle}"/>
+            </StackPanel>
+
+            <!-- Items Section with ScrollViewer -->
+            <ScrollViewer Grid.Row="1"
+                          MaxHeight="600"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <Grid>
+                    <ItemsControl ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ItemCardStyle}">
+                                    <CheckBox Style="{StaticResource ItemCheckBoxStyle}"
+                                              IsChecked="{Binding IsCompleted, Mode=TwoWay}">
+                                        <CheckBox.Content>
+                                            <TextBlock Text="{Binding Text}" Style="{StaticResource ItemTextStyle}"/>
+                                        </CheckBox.Content>
+                                    </CheckBox>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Style="{StaticResource EmptyHintStyle}"
+                               Text="今天没有事项"
+                               Visibility="{Binding HasItems, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                </Grid>
+            </ScrollViewer>
         </Grid>
     </Border>
 </Window>

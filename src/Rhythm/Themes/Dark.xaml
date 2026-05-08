@@ -3,17 +3,43 @@
 
     <Color x:Key="WindowBackgroundColor">#1C1C1E</Color>
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#1C1C1E" Opacity="0.78"/>
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#2C2C2E"/>
     <SolidColorBrush x:Key="ForegroundBrush" Color="#F2F2F7"/>
     <SolidColorBrush x:Key="MutedForegroundBrush" Color="#8E8E93"/>
     <SolidColorBrush x:Key="AccentBrush" Color="#0A84FF"/>
     <SolidColorBrush x:Key="DividerBrush" Color="#3A3A3C"/>
+
+    <!-- Header Styles -->
+    <Style x:Key="HeaderDateStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI"/>
+        <Setter Property="Margin" Value="0,0,0,4"/>
+    </Style>
+
+    <Style x:Key="HeaderStatsStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI"/>
+        <Setter Property="Margin" Value="0,0,0,12"/>
+    </Style>
+
+    <!-- Card Container Style -->
+    <Style x:Key="ItemCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="12"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
 
     <Style x:Key="ItemCheckBoxStyle" TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
         <Setter Property="FontSize" Value="15"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI"/>
-        <Setter Property="Padding" Value="0,10"/>
+        <Setter Property="Padding" Value="0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -118,6 +144,9 @@
         <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Margin" Value="8,0,0,0"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        <Setter Property="MaxHeight" Value="63"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsCompleted}" Value="True">
                 <Setter Property="TextDecorations" Value="Strikethrough"/>
@@ -128,9 +157,41 @@
 
     <Style x:Key="EmptyHintStyle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource MutedForegroundBrush}"/>
-        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Normal"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="Margin" Value="0,16,0,4"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,32,0,32"/>
+    </Style>
+
+    <!-- ScrollBar Styles -->
+    <Style TargetType="ScrollBar">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Width" Value="8"/>
+        <Setter Property="Margin" Value="4,0,0,0"/>
+    </Style>
+
+    <Style TargetType="ScrollViewer">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ScrollContentPresenter Grid.Column="0"/>
+                        <ScrollBar Grid.Column="1"
+                                   Name="PART_VerticalScrollBar"
+                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                   Value="{TemplateBinding VerticalOffset}"
+                                   Maximum="{TemplateBinding ScrollableHeight}"
+                                   ViewportSize="{TemplateBinding ViewportHeight}"
+                                   Orientation="Vertical"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="ContextMenu">
