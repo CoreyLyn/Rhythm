@@ -171,3 +171,36 @@ Brainstorm + 实现 Rhythm v1：WPF + .NET 10 + 模式 C 桌面固定 (HWND_BOTT
 ### Next Steps
 
 - None - task complete
+
+
+## Session 6: 版本管理：MinVer 与 git tag 同步
+
+**Date**: 2026-05-08
+**Task**: 版本管理：MinVer 与 git tag 同步
+**Branch**: `master`
+
+### Summary
+
+添加 MinVer NuGet 包，修改 CI checkout fetch-depth: 0，实现版本号自动同步
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `240cdb2` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
