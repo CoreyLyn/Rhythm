@@ -1,6 +1,11 @@
 # Rhythm
 
+[![CI](https://github.com/corey/Rhythm/actions/workflows/ci.yml/badge.svg)](https://github.com/corey/Rhythm/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Windows 桌面便签：每天显示一份重复 to-do 清单；勾选完成；本地午夜自动重置；事项可自定义。
+
+![Screenshot](docs/screenshot.png)
 
 ## 功能
 
