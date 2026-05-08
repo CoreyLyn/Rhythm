@@ -1,0 +1,63 @@
+<Window x:Class="Rhythm.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        SizeToContent="Height"
+        Width="320"
+        MinHeight="120"
+        WindowStartupLocation="Manual"
+        Title="Rhythm">
+
+    <Border Background="{StaticResource WindowBackgroundBrush}"
+            CornerRadius="10"
+            Padding="14"
+            MouseLeftButtonDown="OnBorderMouseLeftButtonDown">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Rhythm" Style="{StaticResource HeaderTitleStyle}"/>
+                    <TextBlock Text="{Binding TodayLabel}" Style="{StaticResource HeaderDateStyle}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Style="{StaticResource CloseButtonStyle}"
+                            Content="..."
+                            Click="OnEditClick"
+                            ToolTip="编辑事项"
+                            Margin="0,0,2,0"/>
+                    <Button Style="{StaticResource CloseButtonStyle}"
+                            Content="X"
+                            Click="OnCloseClick"
+                            ToolTip="隐藏到托盘"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="0,10,0,0">
+                <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Style="{StaticResource ItemCheckBoxStyle}"
+                                      IsChecked="{Binding IsCompleted, Mode=TwoWay}">
+                                <CheckBox.Content>
+                                    <TextBlock Text="{Binding Text}" Style="{StaticResource ItemTextStyle}"/>
+                                </CheckBox.Content>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

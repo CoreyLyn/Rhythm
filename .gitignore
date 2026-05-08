@@ -1,0 +1,13 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+publish/
+.idea/
+.DS_Store
+
+# Agent tool configs (per-developer, not project code)
+.agents/
+.claude/
+.codex/

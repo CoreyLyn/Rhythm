@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+
+namespace Rhythm.State;
+
+public sealed record RhythmItem(Guid Id, string Text);
+
+public sealed record WindowPos(double X, double Y, double Width, double Height, string ScreenDeviceName);
+
+public sealed class StateDocument
+{
+    public const int CurrentSchemaVersion = 1;
+
+    public int SchemaVersion { get; init; } = CurrentSchemaVersion;
+    public List<RhythmItem> Items { get; init; } = new();
+    public List<Guid> CompletedToday { get; init; } = new();
+    public DateOnly LastResetDate { get; init; }
+    public WindowPos? WindowPos { get; init; }
+}
