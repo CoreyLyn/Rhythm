@@ -13,8 +13,6 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public ObservableCollection<ItemViewModel> Items { get; }
 
-    public string TodayLabel => DateTime.Today.ToString("yyyy-MM-dd ddd");
-
     public bool HasItems => Items.Count > 0;
 
     public WindowPos? WindowPos => _service.State.WindowPos;
@@ -79,7 +77,6 @@ public sealed class MainViewModel : INotifyPropertyChanged
         Items.Clear();
         foreach (var item in snapshot)
             Items.Add(new ItemViewModel(_service, item));
-        OnPropertyChanged(nameof(TodayLabel));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

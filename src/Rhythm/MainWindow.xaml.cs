@@ -122,7 +122,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnCloseClick(object sender, RoutedEventArgs e) => Hide();
+    private void OnHideClick(object sender, RoutedEventArgs e) => Hide();
 
     private void OnEditClick(object sender, RoutedEventArgs e)
     {
@@ -130,8 +130,24 @@ public partial class MainWindow : Window
             app.OpenEditItems();
     }
 
+    private void OnExitClick(object sender, RoutedEventArgs e)
+    {
+        if (Application.Current is App app)
+            app.ShutdownFromUi();
+    }
+
+    private void OnWindowKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            Hide();
+            e.Handled = true;
+        }
+    }
+
     private void OnBorderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+        if (e.ChangedButton != MouseButton.Left) return;
         if (e.ButtonState == MouseButtonState.Pressed)
             DragMove();
     }

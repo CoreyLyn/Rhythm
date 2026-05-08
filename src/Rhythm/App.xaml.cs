@@ -61,6 +61,8 @@ public partial class App : Application
         var menu = new ContextMenu();
         var miShow = new MenuItem { Header = "显示窗口" };
         miShow.Click += (_, _) => ShowMainWindow();
+        var miHide = new MenuItem { Header = "隐藏窗口" };
+        miHide.Click += (_, _) => HideMainWindow();
         var miEdit = new MenuItem { Header = "编辑事项..." };
         miEdit.Click += (_, _) => OpenEditItems();
         var miAutostart = new MenuItem { Header = "开机启动", IsCheckable = true, IsChecked = AutostartManager.IsEnabled() };
@@ -83,6 +85,7 @@ public partial class App : Application
         miExit.Click += (_, _) => ShutdownApp();
 
         menu.Items.Add(miShow);
+        menu.Items.Add(miHide);
         menu.Items.Add(miEdit);
         menu.Items.Add(new Separator());
         menu.Items.Add(miAutostart);
@@ -101,6 +104,10 @@ public partial class App : Application
         if (!_mainWindow.IsVisible) _mainWindow.Show();
         _mainWindow.Activate();
     }
+
+    private void HideMainWindow() => _mainWindow?.Hide();
+
+    public void ShutdownFromUi() => ShutdownApp();
 
     public void OpenEditItems()
     {

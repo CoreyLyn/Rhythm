@@ -8,56 +8,36 @@
         ResizeMode="NoResize"
         SizeToContent="Height"
         Width="320"
-        MinHeight="120"
+        MinHeight="80"
         WindowStartupLocation="Manual"
+        KeyDown="OnWindowKeyDown"
         Title="Rhythm">
 
     <Border Background="{StaticResource WindowBackgroundBrush}"
             CornerRadius="10"
             Padding="14"
+            Focusable="True"
             MouseLeftButtonDown="OnBorderMouseLeftButtonDown">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <Border.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="编辑事项..." Click="OnEditClick"/>
+                <MenuItem Header="隐藏窗口" Click="OnHideClick"/>
+                <Separator/>
+                <MenuItem Header="退出 Rhythm" Click="OnExitClick"/>
+            </ContextMenu>
+        </Border.ContextMenu>
 
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Rhythm" Style="{StaticResource HeaderTitleStyle}"/>
-                    <TextBlock Text="{Binding TodayLabel}" Style="{StaticResource HeaderDateStyle}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Style="{StaticResource CloseButtonStyle}"
-                            Content="..."
-                            Click="OnEditClick"
-                            ToolTip="编辑事项"
-                            Margin="0,0,2,0"/>
-                    <Button Style="{StaticResource CloseButtonStyle}"
-                            Content="X"
-                            Click="OnCloseClick"
-                            ToolTip="隐藏到托盘"/>
-                </StackPanel>
-            </Grid>
-
-            <Grid Grid.Row="1" Margin="0,10,0,0">
-                <ItemsControl ItemsSource="{Binding Items}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Style="{StaticResource ItemCheckBoxStyle}"
-                                      IsChecked="{Binding IsCompleted, Mode=TwoWay}">
-                                <CheckBox.Content>
-                                    <TextBlock Text="{Binding Text}" Style="{StaticResource ItemTextStyle}"/>
-                                </CheckBox.Content>
-                            </CheckBox>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
-        </Grid>
+        <ItemsControl ItemsSource="{Binding Items}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Style="{StaticResource ItemCheckBoxStyle}"
+                              IsChecked="{Binding IsCompleted, Mode=TwoWay}">
+                        <CheckBox.Content>
+                            <TextBlock Text="{Binding Text}" Style="{StaticResource ItemTextStyle}"/>
+                        </CheckBox.Content>
+                    </CheckBox>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Border>
 </Window>
