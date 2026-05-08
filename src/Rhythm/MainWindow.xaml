@@ -1,6 +1,7 @@
 <Window x:Class="Rhythm.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Rhythm"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -27,17 +28,23 @@
             </ContextMenu>
         </Border.ContextMenu>
 
-        <ItemsControl ItemsSource="{Binding Items}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox Style="{StaticResource ItemCheckBoxStyle}"
-                              IsChecked="{Binding IsCompleted, Mode=TwoWay}">
-                        <CheckBox.Content>
-                            <TextBlock Text="{Binding Text}" Style="{StaticResource ItemTextStyle}"/>
-                        </CheckBox.Content>
-                    </CheckBox>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <Grid>
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Style="{StaticResource ItemCheckBoxStyle}"
+                                  IsChecked="{Binding IsCompleted, Mode=TwoWay}">
+                            <CheckBox.Content>
+                                <TextBlock Text="{Binding Text}" Style="{StaticResource ItemTextStyle}"/>
+                            </CheckBox.Content>
+                        </CheckBox>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Style="{StaticResource EmptyHintStyle}"
+                       Text="今天没有事项"
+                       Visibility="{Binding HasItems, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+        </Grid>
     </Border>
 </Window>
