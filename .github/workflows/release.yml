@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Rhythm.slnx
+
+      - name: Build
+        run: dotnet build Rhythm.slnx -c Release --no-restore
+
+      - name: Publish
+        run: |
+          dotnet publish src/Rhythm/Rhythm.csproj -c Release -r win-x64 `
+            -p:PublishSingleFile=true `
+            -p:SelfContained=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -o publish
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Rename executable
+        run: mv publish/Rhythm.exe publish/Rhythm-${{ steps.version.outputs.VERSION }}.exe
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: publish/Rhythm-${{ steps.version.outputs.VERSION }}.exe
+          generate_release_notes: true
