@@ -72,3 +72,36 @@ Brainstorm + 实现 Rhythm v1：WPF + .NET 10 + 模式 C 桌面固定 (HWND_BOTT
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: Rhythm 主窗口视觉与交互优化 v2
+
+**Date**: 2026-05-08
+**Task**: Rhythm 主窗口视觉与交互优化 v2
+**Branch**: `master`
+
+### Summary
+
+完成 CheckBox 自定义 Template（圆角 4px + iOS 蓝选中态 + 白勾 + hover + 150ms 动画）、字号 15 + Medium 字重、整卡可点、已完成态 Opacity 0.55、空状态显示、ContextMenu 暗色样式（移除 Icon 列 + 分隔线延伸）。新增 InverseBoolToVisibilityConverter。测试 19/19 通过。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `ca8a348` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
