@@ -252,6 +252,22 @@
     <Style TargetType="Separator">
         <Setter Property="Height" Value="1"/>
         <Setter Property="Margin" Value="0,4"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Height="1"
+                            Background="{StaticResource DividerBrush}"
+                            Margin="0"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Margin" Value="0,4"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Separator">

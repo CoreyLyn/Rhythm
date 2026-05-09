@@ -257,3 +257,28 @@ private void ShutdownApp()
 ```
 
 `App.xaml` 必须设 `ShutdownMode="OnExplicitShutdown"`，否则 `Shutdown()` 路径与 OnMainWindowClose 路径相互冲突。
+
+## Convention: 菜单分隔符必须覆盖 MenuItem.SeparatorStyleKey
+
+**What**：右键菜单 / 托盘菜单里的分隔线不要只依赖普通 `Style TargetType="Separator"`；必须同时定义 `x:Key="{x:Static MenuItem.SeparatorStyleKey}"` 的 `Separator` 样式。
+
+**Why**：WPF 菜单内部的 separator 使用菜单专用样式 key。只改普通 `Separator` 样式时，菜单保留左侧图标 gutter，视觉上会出现分隔线左侧缺一段。
+
+**Example**：
+
+```xml
+<Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+    <Setter Property="Height" Value="1"/>
+    <Setter Property="Margin" Value="0,4"/>
+    <Setter Property="SnapsToDevicePixels" Value="True"/>
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="Separator">
+                <Border Height="1"
+                        Background="{StaticResource DividerBrush}"
+                        Margin="0"/>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>
+```
