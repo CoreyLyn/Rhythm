@@ -1,86 +1,345 @@
-<Window x:Class="Rhythm.EditItemsWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Rhythm — 编辑事项"
-        Width="400"
-        Height="500"
-        ResizeMode="CanResize"
-        Background="#1C1C1E"
-        WindowStartupLocation="CenterOwner"
-        ShowInTaskbar="True">
+<Window
+    x:Class="Rhythm.EditItemsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Rhythm - 编辑事项"
+    Width="460"
+    Height="620"
+    MinWidth="420"
+    MinHeight="520"
+    AllowsTransparency="True"
+    Background="Transparent"
+    KeyDown="OnWindowKeyDown"
+    ResizeMode="CanResize"
+    ShowInTaskbar="True"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None">
 
     <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="#2C2C2E"/>
-            <Setter Property="Foreground" Value="#F2F2F7"/>
-            <Setter Property="BorderBrush" Value="#3A3A3C"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="10,4"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Cursor" Value="Hand"/>
+        <SolidColorBrush x:Key="EditSurfaceBrush" Color="#242426" />
+        <SolidColorBrush x:Key="EditCardHoverBrush" Color="#343438" />
+        <SolidColorBrush x:Key="EditDangerBrush" Color="#FF453A" />
+        <SolidColorBrush x:Key="EditInputBackgroundBrush" Color="#202022" />
+
+        <Style x:Key="DialogTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
         </Style>
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#2C2C2E"/>
-            <Setter Property="Foreground" Value="#F2F2F7"/>
-            <Setter Property="CaretBrush" Value="#F2F2F7"/>
-            <Setter Property="BorderBrush" Value="#3A3A3C"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="6,4"/>
-            <Setter Property="FontSize" Value="13"/>
+
+        <Style
+            x:Key="DialogHintStyle"
+            BasedOn="{StaticResource DialogTextStyle}"
+            TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource MutedForegroundBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="LineHeight" Value="18" />
+            <Setter Property="TextWrapping" Value="Wrap" />
         </Style>
-        <Style TargetType="ListBoxItem">
-            <Setter Property="Foreground" Value="#F2F2F7"/>
-            <Setter Property="Padding" Value="6,4"/>
-            <Setter Property="FontSize" Value="13"/>
+
+        <Style x:Key="DialogButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="34" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="ButtonBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource EditCardHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource DividerBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            x:Key="PrimaryButtonStyle"
+            BasedOn="{StaticResource DialogButtonStyle}"
+            TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <Style
+            x:Key="DangerButtonStyle"
+            BasedOn="{StaticResource DialogButtonStyle}"
+            TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource EditDangerBrush}" />
+        </Style>
+
+        <Style x:Key="DialogTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource EditInputBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+            <Setter Property="CaretBrush" Value="{StaticResource ForegroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border
+                            x:Name="TextBoxBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="TextBoxBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            x:Key="EditorItemTextStyle"
+            BasedOn="{StaticResource DialogTextStyle}"
+            TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="MaxHeight" Value="60" />
+        </Style>
+
+        <Style x:Key="EditorListBoxStyle" TargetType="ListBox">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Margin" Value="0,0,0,8" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border
+                                        x:Name="ItemBorder"
+                                        Padding="12"
+                                        Background="{StaticResource CardBackgroundBrush}"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                        <ContentPresenter />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource EditCardHoverBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource EditCardHoverBrush}" />
+                                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
-    <Grid Margin="14">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border
+        Background="{StaticResource WindowBackgroundBrush}"
+        BorderBrush="{StaticResource DividerBrush}"
+        BorderThickness="1"
+        CornerRadius="12"
+        MouseLeftButtonDown="OnWindowChromeMouseLeftButtonDown"
+        SnapsToDevicePixels="True">
+        <Grid Margin="18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <ListBox Grid.Row="0"
-                 x:Name="ItemsList"
-                 Background="#2C2C2E"
-                 Foreground="#F2F2F7"
-                 BorderBrush="#3A3A3C"
-                 BorderThickness="1">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Text}"/>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            <Grid Grid.Row="0" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="1"
-                   Text="选中后可重命名 / 上下移动 / 删除："
-                   Foreground="#8E8E93"
-                   FontSize="11"
-                   Margin="0,8,0,4"/>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Style="{StaticResource HeaderDateStyle}" Text="编辑事项" />
+                    <TextBlock
+                        Margin="0,2,0,0"
+                        Style="{StaticResource DialogHintStyle}"
+                        Text="调整今天的事项顺序、名称和内容。" />
+                </StackPanel>
 
-        <TextBox Grid.Row="2"
-                 x:Name="EditTextBox"
-                 Text="{Binding ElementName=ItemsList, Path=SelectedItem.Text, Mode=OneWay}"/>
+                <Button
+                    Grid.Column="1"
+                    Width="34"
+                    Padding="0"
+                    Click="OnCloseClick"
+                    Content="X"
+                    Style="{StaticResource DialogButtonStyle}" />
+            </Grid>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,8,0,0">
-            <Button Content="重命名" Click="OnRename" Margin="0,0,8,0"/>
-            <Button Content="上移" Click="OnMoveUp" Margin="0,0,4,0"/>
-            <Button Content="下移" Click="OnMoveDown" Margin="0,0,8,0"/>
-            <Button Content="删除" Click="OnRemove" Foreground="#FF453A"/>
-        </StackPanel>
+            <Border
+                Grid.Row="1"
+                MinHeight="180"
+                Padding="10"
+                Background="{StaticResource EditSurfaceBrush}"
+                CornerRadius="10">
+                <Grid>
+                    <ListBox
+                        x:Name="ItemsList"
+                        SelectionChanged="OnSelectionChanged"
+                        Style="{StaticResource EditorListBoxStyle}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Style="{StaticResource EditorItemTextStyle}" Text="{Binding Text}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
 
-        <Grid Grid.Row="4" Margin="0,12,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" x:Name="NewItemText" KeyDown="OnNewItemKeyDown"/>
-            <Button Grid.Column="1" Content="+ 添加" Click="OnAdd" Margin="8,0,0,0"/>
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource EmptyHintStyle}"
+                        Text="还没有事项"
+                        Visibility="{Binding HasItems, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                </Grid>
+            </Border>
+
+            <Border
+                Grid.Row="2"
+                Margin="0,12,0,0"
+                Padding="12"
+                Background="{StaticResource EditSurfaceBrush}"
+                CornerRadius="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock
+                        Grid.Row="0"
+                        Margin="0,0,0,8"
+                        Style="{StaticResource DialogHintStyle}"
+                        Text="选中事项" />
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox
+                            x:Name="EditTextBox"
+                            Grid.Column="0"
+                            MinWidth="120"
+                            IsEnabled="False"
+                            KeyDown="OnEditItemKeyDown"
+                            Style="{StaticResource DialogTextBoxStyle}" />
+                        <Button
+                            x:Name="RenameButton"
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            Click="OnRename"
+                            Content="重命名"
+                            IsEnabled="False"
+                            Style="{StaticResource DialogButtonStyle}" />
+                        <Button
+                            x:Name="MoveUpButton"
+                            Grid.Column="2"
+                            Width="34"
+                            Margin="8,0,0,0"
+                            Padding="0"
+                            Click="OnMoveUp"
+                            Content="↑"
+                            IsEnabled="False"
+                            Style="{StaticResource DialogButtonStyle}"
+                            ToolTip="上移" />
+                        <Button
+                            x:Name="MoveDownButton"
+                            Grid.Column="3"
+                            Width="34"
+                            Margin="6,0,0,0"
+                            Padding="0"
+                            Click="OnMoveDown"
+                            Content="↓"
+                            IsEnabled="False"
+                            Style="{StaticResource DialogButtonStyle}"
+                            ToolTip="下移" />
+                        <Button
+                            x:Name="RemoveButton"
+                            Grid.Column="4"
+                            Margin="8,0,0,0"
+                            Click="OnRemove"
+                            Content="删除"
+                            IsEnabled="False"
+                            Style="{StaticResource DangerButtonStyle}" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="3" Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox
+                    x:Name="NewItemText"
+                    Grid.Column="0"
+                    KeyDown="OnNewItemKeyDown"
+                    Style="{StaticResource DialogTextBoxStyle}" />
+                <Grid Grid.Column="1" Margin="8,0,0,0">
+                    <Button
+                        Click="OnAdd"
+                        Content="+ 添加"
+                        Style="{StaticResource PrimaryButtonStyle}" />
+                </Grid>
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </Window>

@@ -283,6 +283,31 @@ private void ShutdownApp()
 </Style>
 ```
 
+## Convention: 无标题栏窗口拖动必须排除交互控件
+
+**What**：`WindowStyle="None"` 的窗口如果用外层容器实现 `DragMove()`，拖动处理必须只作为背景命中区域。处理前先排除按钮、输入框、列表项、滚动条和 `ResizeGrip` 等交互控件。
+
+**Why**：无标题栏窗口常把拖动事件挂在根 `Border` 上。若不排除子控件，点击按钮、编辑文本、选择列表项、滚动列表或拖拽调整大小都会被窗口拖动抢走，造成弹窗看起来"不听点击"。
+
+**Example**：
+
+```csharp
+private void OnWindowChromeMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+{
+    if (e.ChangedButton != MouseButton.Left) return;
+    if (e.OriginalSource is not DependencyObject source) return;
+    if (FindAncestor<Button>(source) != null) return;
+    if (FindAncestor<TextBox>(source) != null) return;
+    if (FindAncestor<ListBoxItem>(source) != null) return;
+    if (FindAncestor<ScrollBar>(source) != null) return;
+    if (FindAncestor<ResizeGrip>(source) != null) return;
+
+    DragMove();
+}
+```
+
+**Related XAML**：把 `ResizeGrip` 放在独立布局单元中，不要覆盖主操作按钮或滚动区域。
+
 ## Convention: 可勾选托盘菜单项必须显示真实状态
 
 **What**：托盘菜单中的设置开关（例如 "开机启动"）必须在菜单打开时从真实系统状态刷新，并通过 `IsChecked` 显示结果。已知状态下菜单文案保持稳定（例如始终为 "开机启动"），不要追加 "已开启" / "已关闭"；读取失败等未知状态可在 `Header` 中显示异常状态。自定义 `MenuItem` 模板必须保留 `IsCheckable` / `IsChecked` 的可见反馈，并把 check mark 放在菜单文字右侧，不占用文字左侧 gutter。
