@@ -38,7 +38,7 @@ public partial class MainWindow : Window
             WindowChrome.SetWindowChrome(this, new WindowChrome
             {
                 CornerRadius = new CornerRadius(10),
-                GlassFrameThickness = new Thickness(0),
+                GlassFrameThickness = new Thickness(-1),
                 ResizeBorderThickness = new Thickness(0),
                 CaptionHeight = 0
             });

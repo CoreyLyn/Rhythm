@@ -33,7 +33,7 @@ public partial class EditItemsWindow : Window
             WindowChrome.SetWindowChrome(this, new WindowChrome
             {
                 CornerRadius = new CornerRadius(12),
-                GlassFrameThickness = new Thickness(0),
+                GlassFrameThickness = new Thickness(-1),
                 ResizeBorderThickness = new Thickness(5),
                 CaptionHeight = 0
             });
