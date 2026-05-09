@@ -65,14 +65,20 @@ public partial class App : Application
         miHide.Click += (_, _) => HideMainWindow();
         var miEdit = new MenuItem { Header = "编辑事项..." };
         miEdit.Click += (_, _) => OpenEditItems();
-        var miAutostart = new MenuItem { Header = "开机启动", IsCheckable = true, IsChecked = AutostartManager.IsEnabled() };
+        var miAutostart = new MenuItem { IsCheckable = true, StaysOpenOnClick = true };
+        RefreshAutostartMenuItem(miAutostart);
+        menu.Opened += (_, _) => RefreshAutostartMenuItem(miAutostart);
         miAutostart.Click += (_, _) =>
         {
-            try { AutostartManager.Set(miAutostart.IsChecked); }
+            try
+            {
+                AutostartManager.Set(miAutostart.IsChecked);
+                RefreshAutostartMenuItem(miAutostart);
+            }
             catch (Exception ex)
             {
                 MessageBox.Show($"无法修改自启动设置：\n{ex.Message}", "Rhythm", MessageBoxButton.OK, MessageBoxImage.Warning);
-                miAutostart.IsChecked = AutostartManager.IsEnabled();
+                RefreshAutostartMenuItem(miAutostart);
             }
         };
         var miAbout = new MenuItem { Header = "关于 Rhythm" };
@@ -92,6 +98,22 @@ public partial class App : Application
         _trayIcon.ContextMenu = menu;
         _trayIcon.TrayLeftMouseDoubleClick += (_, _) => ShowMainWindow();
         _trayIcon.ForceCreate();
+    }
+
+    private static void RefreshAutostartMenuItem(MenuItem menuItem)
+    {
+        try
+        {
+            var isEnabled = AutostartManager.IsEnabled();
+            menuItem.IsChecked = isEnabled;
+            menuItem.Header = isEnabled ? "开机启动（已开启）" : "开机启动（已关闭）";
+        }
+        catch (Exception ex)
+        {
+            menuItem.IsChecked = false;
+            menuItem.Header = "开机启动（状态未知）";
+            MessageBox.Show($"无法读取自启动设置：\n{ex.Message}", "Rhythm", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private void ShowMainWindow()

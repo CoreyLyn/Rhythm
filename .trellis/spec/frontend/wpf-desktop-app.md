@@ -282,3 +282,36 @@ private void ShutdownApp()
     </Setter>
 </Style>
 ```
+
+## Convention: 可勾选托盘菜单项必须显示真实状态
+
+**What**：托盘菜单中的设置开关（例如 "开机启动"）必须在菜单打开时从真实系统状态刷新，并通过 `IsChecked` 与 `Header` 同时显示结果。自定义 `MenuItem` 模板必须保留 `IsCheckable` / `IsChecked` 的可见反馈。
+
+**Why**：托盘菜单点击后通常会立即关闭；如果只写入设置但没有可见状态，用户无法判断是否生效。自定义菜单模板也会覆盖 WPF 默认勾选区域，必须显式渲染 check mark。
+
+**Example**：
+
+```csharp
+var miAutostart = new MenuItem { IsCheckable = true, StaysOpenOnClick = true };
+RefreshAutostartMenuItem(miAutostart);
+menu.Opened += (_, _) => RefreshAutostartMenuItem(miAutostart);
+
+private static void RefreshAutostartMenuItem(MenuItem menuItem)
+{
+    var isEnabled = AutostartManager.IsEnabled();
+    menuItem.IsChecked = isEnabled;
+    menuItem.Header = isEnabled ? "开机启动（已开启）" : "开机启动（已关闭）";
+}
+```
+
+```xml
+<MultiTrigger>
+    <MultiTrigger.Conditions>
+        <Condition Property="IsCheckable" Value="True" />
+        <Condition Property="IsChecked" Value="True" />
+    </MultiTrigger.Conditions>
+    <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+</MultiTrigger>
+```
+
+**Error handling**：读取或写入 HKCU\Run 失败时，UI 层 `catch` 后显示 `MessageBox`，再调用同一个 refresh helper 恢复为实际状态；不要让菜单项停留在乐观勾选状态。

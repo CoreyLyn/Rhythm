@@ -248,13 +248,49 @@
                         Background="{TemplateBinding Background}"
                         BorderThickness="0"
                         CornerRadius="4">
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Foreground="{TemplateBinding Foreground}"
-                            Text="{TemplateBinding Header}"
-                            TextTrimming="CharacterEllipsis" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="CheckColumn" Width="0" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Path
+                                x:Name="CheckMark"
+                                Grid.Column="0"
+                                Width="10"
+                                Height="8"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Data="M 1,4 L 4,7 L 9,1"
+                                Stroke="{StaticResource AccentBrush}"
+                                StrokeEndLineCap="Round"
+                                StrokeLineJoin="Round"
+                                StrokeStartLineCap="Round"
+                                StrokeThickness="2"
+                                Visibility="Collapsed" />
+
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
+                                Text="{TemplateBinding Header}"
+                                TextTrimming="CharacterEllipsis" />
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsCheckable" Value="False">
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsCheckable" Value="True">
+                            <Setter TargetName="CheckColumn" Property="Width" Value="16" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsCheckable" Value="True" />
+                                <Condition Property="IsChecked" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
                         <Trigger Property="IsHighlighted" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="{StaticResource DividerBrush}" />
                         </Trigger>
