@@ -132,16 +132,18 @@ public partial class App : Application
 
     private void ShowAboutDialog()
     {
-        const string message = "Rhythm v1\n\n本地桌面便签\n勾选完成，每日自动重置。";
-        const string caption = "关于 Rhythm";
-
+        var aboutWindow = new AboutWindow();
         if (_mainWindow?.IsVisible == true)
         {
-            MessageBox.Show(_mainWindow, message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
-            return;
+            aboutWindow.Owner = _mainWindow;
+        }
+        else
+        {
+            aboutWindow.ShowInTaskbar = true;
+            aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
 
-        MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+        aboutWindow.ShowDialog();
     }
 
     public void ShutdownFromUi() => ShutdownApp();
