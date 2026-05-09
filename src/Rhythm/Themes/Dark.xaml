@@ -250,16 +250,24 @@
                         CornerRadius="4">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="CheckColumn" Width="0" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition x:Name="CheckColumn" Width="0" />
                             </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
+                                Text="{TemplateBinding Header}"
+                                TextTrimming="CharacterEllipsis" />
 
                             <Path
                                 x:Name="CheckMark"
-                                Grid.Column="0"
+                                Grid.Column="1"
                                 Width="10"
                                 Height="8"
-                                HorizontalAlignment="Left"
+                                Margin="8,0,0,0"
+                                HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 Data="M 1,4 L 4,7 L 9,1"
                                 Stroke="{StaticResource AccentBrush}"
@@ -268,13 +276,6 @@
                                 StrokeStartLineCap="Round"
                                 StrokeThickness="2"
                                 Visibility="Collapsed" />
-
-                            <TextBlock
-                                Grid.Column="1"
-                                VerticalAlignment="Center"
-                                Foreground="{TemplateBinding Foreground}"
-                                Text="{TemplateBinding Header}"
-                                TextTrimming="CharacterEllipsis" />
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -282,7 +283,7 @@
                             <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="IsCheckable" Value="True">
-                            <Setter TargetName="CheckColumn" Property="Width" Value="16" />
+                            <Setter TargetName="CheckColumn" Property="Width" Value="20" />
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>

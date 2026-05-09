@@ -106,7 +106,7 @@ public partial class App : Application
         {
             var isEnabled = AutostartManager.IsEnabled();
             menuItem.IsChecked = isEnabled;
-            menuItem.Header = isEnabled ? "开机启动（已开启）" : "开机启动（已关闭）";
+            menuItem.Header = "开机启动";
         }
         catch (Exception ex)
         {
