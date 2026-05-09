@@ -76,11 +76,7 @@ public partial class App : Application
             }
         };
         var miAbout = new MenuItem { Header = "关于 Rhythm" };
-        miAbout.Click += (_, _) => MessageBox.Show(
-            "Rhythm v1\n\n本地桌面便签\n勾选完成，每日自动重置。",
-            "关于 Rhythm",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+        miAbout.Click += (_, _) => ShowAboutDialogAfterMenuCloses();
         var miExit = new MenuItem { Header = "退出" };
         miExit.Click += (_, _) => ShutdownApp();
 
@@ -106,6 +102,25 @@ public partial class App : Application
     }
 
     private void HideMainWindow() => _mainWindow?.Hide();
+
+    private void ShowAboutDialogAfterMenuCloses()
+    {
+        Dispatcher.BeginInvoke(new Action(ShowAboutDialog), DispatcherPriority.ContextIdle);
+    }
+
+    private void ShowAboutDialog()
+    {
+        const string message = "Rhythm v1\n\n本地桌面便签\n勾选完成，每日自动重置。";
+        const string caption = "关于 Rhythm";
+
+        if (_mainWindow?.IsVisible == true)
+        {
+            MessageBox.Show(_mainWindow, message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+    }
 
     public void ShutdownFromUi() => ShutdownApp();
 
