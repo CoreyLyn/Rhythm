@@ -4,6 +4,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
+using Rhythm.UI;
 
 namespace Rhythm;
 
@@ -30,7 +31,7 @@ public partial class AboutWindow : Window
             WindowChrome.SetWindowChrome(this, new WindowChrome
             {
                 CornerRadius = new CornerRadius(12),
-                GlassFrameThickness = new Thickness(-1),
+                GlassFrameThickness = new Thickness(0),
                 ResizeBorderThickness = new Thickness(0),
                 CaptionHeight = 0
             });
@@ -46,7 +47,7 @@ public partial class AboutWindow : Window
         // Set border background based on transparency mode
         if (!_enableTransparency)
         {
-            RootBorder.Background = (SolidColorBrush)FindResource("SolidWindowBackgroundBrush");
+            SolidWindowChrome.Apply(this, RootBorder, 12);
         }
     }
 

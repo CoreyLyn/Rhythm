@@ -38,7 +38,7 @@ public partial class MainWindow : Window
             WindowChrome.SetWindowChrome(this, new WindowChrome
             {
                 CornerRadius = new CornerRadius(10),
-                GlassFrameThickness = new Thickness(-1),
+                GlassFrameThickness = new Thickness(0),
                 ResizeBorderThickness = new Thickness(0),
                 CaptionHeight = 0
             });
@@ -71,13 +71,12 @@ public partial class MainWindow : Window
         // Set border background based on transparency mode
         if (!_enableTransparency)
         {
-            var brush = (SolidColorBrush)FindResource("SolidWindowBackgroundBrush");
-            RootBorder.Background = brush;
+            SolidWindowChrome.Apply(this, RootBorder, 10);
 
             // Set context menu background
             if (RootBorder.ContextMenu != null)
             {
-                RootBorder.ContextMenu.Background = brush;
+                RootBorder.ContextMenu.Background = Background;
             }
         }
 

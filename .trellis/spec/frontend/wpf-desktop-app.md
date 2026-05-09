@@ -205,6 +205,32 @@ DWM Mica 要求 hwnd 由 DWM 复合（无 per-pixel alpha 旗），WPF `AllowsTr
 - 要圆角 + 全窗透明 → `AllowsTransparency=True` + 软件半透明 RGBA（跨 Win10/11 一致）
 - 要真 Mica → `AllowsTransparency=False` + WindowChrome / hwnd region 自绘圆角（参考 WPF-UI FluentWindow，工程量大，多在 v2）
 
+#### Wrong：非透明窗口只设置 Border.CornerRadius
+
+```xml
+<Window AllowsTransparency="False" Background="#1C1C1E">
+  <Border Background="#1C1C1E" CornerRadius="10" />
+</Window>
+```
+
+WPF 的 `Border.CornerRadius` 只影响 WPF 内容绘制，不裁剪 Win32 HWND 本身。关闭透明后，矩形窗口背景仍会在圆角外露出，截图表现为圆角边框周围出现方角/填充异常。
+
+#### Correct：非透明圆角窗口同时裁 HWND region
+
+```csharp
+WindowChrome.SetWindowChrome(this, new WindowChrome
+{
+    CornerRadius = new CornerRadius(10),
+    GlassFrameThickness = new Thickness(0),
+    ResizeBorderThickness = new Thickness(0),
+    CaptionHeight = 0
+});
+
+SolidWindowChrome.Apply(this, RootBorder, 10);
+```
+
+非透明模式必须保持 `Window.Background` 和根 `Border.Background` 为同一个实色 brush，并用 `SetWindowRgn(CreateRoundRectRgn(...))` 按 DPI / size 更新 native region。透明模式继续走 `AllowsTransparency=True`，不要混用 region 裁剪。
+
 ## Convention: 状态机与持久化分层
 
 **What**：状态机（如 `RhythmState`）纯 C# 不依赖 WPF；持久化（如 `StateStore`）独立，atomic write 经 temp + File.Move(overwrite)，失败时回退默认 + log 到 stderr。
