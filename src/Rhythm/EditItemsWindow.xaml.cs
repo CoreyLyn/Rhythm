@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shell;
 using Rhythm.UI;
 
 namespace Rhythm;
@@ -27,6 +28,15 @@ public partial class EditItemsWindow : Window
         {
             AllowsTransparency = false;
             Background = (SolidColorBrush)Application.Current.FindResource("SolidWindowBackgroundBrush");
+
+            // Use WindowChrome for rounded corners in non-transparent mode
+            WindowChrome.SetWindowChrome(this, new WindowChrome
+            {
+                CornerRadius = new CornerRadius(12),
+                GlassFrameThickness = new Thickness(0),
+                ResizeBorderThickness = new Thickness(5),
+                CaptionHeight = 0
+            });
         }
 
         InitializeComponent();
