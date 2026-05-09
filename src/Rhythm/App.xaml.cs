@@ -17,8 +17,11 @@ public partial class App : Application
     private MainViewModel? _viewModel;
     private MainWindow? _mainWindow;
     private DispatcherTimer? _midnightTimer;
+    private bool _isRecreatingWindow;
 
     public bool IsShuttingDown { get; private set; }
+
+    public bool IsRecreatingWindow => _isRecreatingWindow;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -42,7 +45,7 @@ public partial class App : Application
 
         var service = new RhythmStateService(state);
         _viewModel = new MainViewModel(service);
-        _mainWindow = new MainWindow { DataContext = _viewModel };
+        _mainWindow = new MainWindow(state.EnableTransparency) { DataContext = _viewModel };
         _mainWindow.Show();
 
         BuildTrayIcon();
@@ -81,6 +84,27 @@ public partial class App : Application
                 RefreshAutostartMenuItem(miAutostart);
             }
         };
+
+        var miTransparency = new MenuItem { IsCheckable = true, StaysOpenOnClick = true };
+        RefreshTransparencyMenuItem(miTransparency);
+        menu.Opened += (_, _) => RefreshTransparencyMenuItem(miTransparency);
+        miTransparency.Click += (_, _) =>
+        {
+            if (_viewModel == null) return;
+            try
+            {
+                var newValue = !miTransparency.IsChecked;
+                _viewModel.SetEnableTransparency(newValue);
+                miTransparency.IsChecked = newValue;
+                RecreateMainWindow(newValue);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"无法修改透明设置：\n{ex.Message}", "Rhythm", MessageBoxButton.OK, MessageBoxImage.Warning);
+                RefreshTransparencyMenuItem(miTransparency);
+            }
+        };
+
         var miAbout = new MenuItem { Header = "关于 Rhythm" };
         miAbout.Click += (_, _) => ShowAboutDialogAfterMenuCloses();
         var miExit = new MenuItem { Header = "退出" };
@@ -91,6 +115,7 @@ public partial class App : Application
         menu.Items.Add(miEdit);
         menu.Items.Add(new Separator());
         menu.Items.Add(miAutostart);
+        menu.Items.Add(miTransparency);
         menu.Items.Add(new Separator());
         menu.Items.Add(miAbout);
         menu.Items.Add(miExit);
@@ -114,6 +139,52 @@ public partial class App : Application
             menuItem.Header = "开机启动（状态未知）";
             MessageBox.Show($"无法读取自启动设置：\n{ex.Message}", "Rhythm", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+    }
+
+    private void RefreshTransparencyMenuItem(MenuItem menuItem)
+    {
+        if (_viewModel == null)
+        {
+            menuItem.IsChecked = false;
+            menuItem.Header = "透明效果（状态未知）";
+            return;
+        }
+        menuItem.IsChecked = _viewModel.EnableTransparency;
+        menuItem.Header = "透明效果";
+    }
+
+    private void RecreateMainWindow(bool enableTransparency)
+    {
+        if (_mainWindow == null || _viewModel == null) return;
+
+        // Save current window position and size
+        var oldLeft = _mainWindow.Left;
+        var oldTop = _mainWindow.Top;
+        var oldWidth = _mainWindow.Width;
+        var oldHeight = _mainWindow.ActualHeight;
+
+        // Set flag to allow window to close for recreation
+        _isRecreatingWindow = true;
+
+        // Close old window
+        _mainWindow.Close();
+
+        // Reset flag
+        _isRecreatingWindow = false;
+
+        // Create new window with updated transparency setting
+        _mainWindow = new MainWindow(enableTransparency) { DataContext = _viewModel };
+        _mainWindow.Left = oldLeft;
+        _mainWindow.Top = oldTop;
+        _mainWindow.Width = oldWidth;
+        // Height is controlled by SizeToContent, so we restore it after load
+        _mainWindow.Loaded += (_, _) =>
+        {
+            // Restore height if it differs from saved height (e.g., after manual resize)
+            if (Math.Abs(_mainWindow.ActualHeight - oldHeight) > 1 && oldHeight > 0)
+                _mainWindow.Height = oldHeight;
+        };
+        _mainWindow.Show();
     }
 
     private void ShowMainWindow()

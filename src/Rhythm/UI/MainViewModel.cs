@@ -26,6 +26,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public WindowPos? WindowPos => _service.State.WindowPos;
 
+    public bool EnableTransparency => _service.State.EnableTransparency;
+
     public MainViewModel(RhythmStateService service)
     {
         ArgumentNullException.ThrowIfNull(service);
@@ -57,6 +59,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public void UpdateWindowPos(WindowPos pos) => _service.State.SetWindowPos(pos);
 
     public void PersistWindowPos() => _service.Persist();
+
+    public void SetEnableTransparency(bool enabled)
+    {
+        _service.State.SetEnableTransparency(enabled);
+        _service.Persist();
+    }
 
     public ItemViewModel AddItem(string text)
     {

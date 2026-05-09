@@ -33,6 +33,7 @@ public sealed class StateStoreTests : IDisposable
             CompletedToday = new() { Guid.NewGuid() },
             LastResetDate = new DateOnly(2026, 5, 8),
             WindowPos = new WindowPos(10, 20, 300, 400, @"\\.\DISPLAY1"),
+            EnableTransparency = false,
         };
 
         StateStore.Save(doc, _path);
@@ -43,6 +44,7 @@ public sealed class StateStoreTests : IDisposable
         Assert.Equal(doc.CompletedToday, loaded.CompletedToday);
         Assert.Equal(doc.LastResetDate, loaded.LastResetDate);
         Assert.Equal(doc.WindowPos, loaded.WindowPos);
+        Assert.Equal(doc.EnableTransparency, loaded.EnableTransparency);
     }
 
     [Fact]
@@ -52,6 +54,7 @@ public sealed class StateStoreTests : IDisposable
         Assert.Equal(StateDocument.CurrentSchemaVersion, loaded.SchemaVersion);
         Assert.Empty(loaded.Items);
         Assert.Empty(loaded.CompletedToday);
+        Assert.True(loaded.EnableTransparency); // Default value
     }
 
     [Fact]

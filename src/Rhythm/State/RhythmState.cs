@@ -16,12 +16,14 @@ public sealed class RhythmState
         _completed = doc.CompletedToday.ToHashSet();
         LastResetDate = doc.LastResetDate;
         WindowPos = doc.WindowPos;
+        EnableTransparency = doc.EnableTransparency;
     }
 
     public IReadOnlyList<RhythmItem> Items => _items;
     public IReadOnlySet<Guid> CompletedToday => _completed;
     public DateOnly LastResetDate { get; private set; }
     public WindowPos? WindowPos { get; private set; }
+    public bool EnableTransparency { get; private set; }
 
     public bool RolloverIfNeeded(DateOnly today)
     {
@@ -85,6 +87,8 @@ public sealed class RhythmState
 
     public void SetWindowPos(WindowPos? pos) => WindowPos = pos;
 
+    public void SetEnableTransparency(bool enabled) => EnableTransparency = enabled;
+
     public StateDocument ToDocument() => new()
     {
         SchemaVersion = StateDocument.CurrentSchemaVersion,
@@ -92,5 +96,6 @@ public sealed class RhythmState
         CompletedToday = _completed.ToList(),
         LastResetDate = LastResetDate,
         WindowPos = WindowPos,
+        EnableTransparency = EnableTransparency,
     };
 }

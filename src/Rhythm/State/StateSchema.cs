@@ -16,4 +16,5 @@ public sealed class StateDocument
     public List<Guid> CompletedToday { get; init; } = new();
     public DateOnly LastResetDate { get; init; }
     public WindowPos? WindowPos { get; init; }
+    public bool EnableTransparency { get; init; } = true;
 }

@@ -167,11 +167,13 @@ public class RhythmStateTests
         var a = state.AddItem("A");
         state.ToggleItem(a.Id);
         state.SetWindowPos(new WindowPos(10, 20, 300, 400, "DISPLAY1"));
+        state.SetEnableTransparency(false);
         var doc = state.ToDocument();
 
         Assert.Equal(StateDocument.CurrentSchemaVersion, doc.SchemaVersion);
         Assert.Single(doc.Items);
         Assert.Single(doc.CompletedToday);
         Assert.Equal("DISPLAY1", doc.WindowPos!.ScreenDeviceName);
+        Assert.False(doc.EnableTransparency);
     }
 }

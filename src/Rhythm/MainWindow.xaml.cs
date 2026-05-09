@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Rhythm.Interop;
 using Rhythm.State;
@@ -15,9 +16,26 @@ public partial class MainWindow : Window
 {
     private bool _isReady;
     private DispatcherTimer? _saveDebounce;
+    private readonly bool _enableTransparency;
 
-    public MainWindow()
+    public MainWindow(bool enableTransparency = true)
     {
+        _enableTransparency = enableTransparency;
+
+        // Set window properties before InitializeComponent
+        if (enableTransparency)
+        {
+            AllowsTransparency = true;
+            Background = Brushes.Transparent;
+        }
+        else
+        {
+            AllowsTransparency = false;
+            var brush = new SolidColorBrush(Color.FromRgb(0x1C, 0x1C, 0x1E));
+            brush.Freeze();
+            Background = brush;
+        }
+
         InitializeComponent();
         SourceInitialized += OnSourceInitialized;
         Loaded += OnLoaded;
@@ -42,6 +60,14 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        // Set border background based on transparency mode
+        if (!_enableTransparency)
+        {
+            var brush = new SolidColorBrush(Color.FromRgb(0x1C, 0x1C, 0x1E));
+            brush.Freeze();
+            RootBorder.Background = brush;
+        }
+
         if (DataContext is not MainViewModel vm) return;
 
         if (vm.WindowPos is { } pos && IsOnScreen(pos))
@@ -115,7 +141,7 @@ public partial class MainWindow : Window
         if (DataContext is MainViewModel vm)
             vm.PersistWindowPos();
 
-        if (Application.Current is App app && !app.IsShuttingDown)
+        if (Application.Current is App app && !app.IsShuttingDown && !app.IsRecreatingWindow)
         {
             e.Cancel = true;
             Hide();
