@@ -7,8 +7,6 @@
     Height="620"
     MinWidth="420"
     MinHeight="520"
-    AllowsTransparency="True"
-    Background="Transparent"
     KeyDown="OnWindowKeyDown"
     ResizeMode="CanResize"
     ShowInTaskbar="True"
@@ -182,6 +180,7 @@
     </Window.Resources>
 
     <Border
+        x:Name="RootBorder"
         Background="{StaticResource WindowBackgroundBrush}"
         BorderBrush="{StaticResource DividerBrush}"
         BorderThickness="1"

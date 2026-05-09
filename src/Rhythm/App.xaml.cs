@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using H.NotifyIcon;
@@ -62,6 +63,8 @@ public partial class App : Application
         };
 
         var menu = new ContextMenu();
+        var enableTransparency = _viewModel?.EnableTransparency ?? true;
+        UpdateMenuBackground(menu, enableTransparency);
         var miShow = new MenuItem { Header = "显示窗口" };
         miShow.Click += (_, _) => ShowMainWindow();
         var miHide = new MenuItem { Header = "隐藏窗口" };
@@ -185,6 +188,24 @@ public partial class App : Application
                 _mainWindow.Height = oldHeight;
         };
         _mainWindow.Show();
+
+        // Update tray menu background
+        if (_trayIcon?.ContextMenu != null)
+            UpdateMenuBackground(_trayIcon.ContextMenu, enableTransparency);
+    }
+
+    private void UpdateMenuBackground(ContextMenu menu, bool enableTransparency)
+    {
+        if (enableTransparency)
+        {
+            // Use transparent brush (let the style take over)
+            menu.ClearValue(ContextMenu.BackgroundProperty);
+        }
+        else
+        {
+            // Use solid background
+            menu.Background = (SolidColorBrush)Current.FindResource("SolidWindowBackgroundBrush");
+        }
     }
 
     private void ShowMainWindow()
@@ -203,7 +224,8 @@ public partial class App : Application
 
     private void ShowAboutDialog()
     {
-        var aboutWindow = new AboutWindow();
+        var enableTransparency = _viewModel?.EnableTransparency ?? true;
+        var aboutWindow = new AboutWindow(enableTransparency);
         if (_mainWindow?.IsVisible == true)
         {
             aboutWindow.Owner = _mainWindow;
@@ -222,7 +244,8 @@ public partial class App : Application
     public void OpenEditItems()
     {
         if (_viewModel == null) return;
-        var w = new EditItemsWindow(_viewModel)
+        var enableTransparency = _viewModel.EnableTransparency;
+        var w = new EditItemsWindow(_viewModel, enableTransparency)
         {
             Owner = _mainWindow?.IsVisible == true ? _mainWindow : null,
         };

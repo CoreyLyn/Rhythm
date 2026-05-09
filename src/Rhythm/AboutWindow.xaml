@@ -5,8 +5,6 @@
     Title="关于 Rhythm"
     Width="360"
     Height="300"
-    AllowsTransparency="True"
-    Background="Transparent"
     KeyDown="OnWindowKeyDown"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
@@ -115,6 +113,7 @@
     </Window.Resources>
 
     <Border
+        x:Name="RootBorder"
         Background="{StaticResource WindowBackgroundBrush}"
         BorderBrush="{StaticResource DividerBrush}"
         BorderThickness="1"

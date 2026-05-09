@@ -31,9 +31,7 @@ public partial class MainWindow : Window
         else
         {
             AllowsTransparency = false;
-            var brush = new SolidColorBrush(Color.FromRgb(0x1C, 0x1C, 0x1E));
-            brush.Freeze();
-            Background = brush;
+            Background = (SolidColorBrush)Application.Current.FindResource("SolidWindowBackgroundBrush");
         }
 
         InitializeComponent();
@@ -63,9 +61,14 @@ public partial class MainWindow : Window
         // Set border background based on transparency mode
         if (!_enableTransparency)
         {
-            var brush = new SolidColorBrush(Color.FromRgb(0x1C, 0x1C, 0x1E));
-            brush.Freeze();
+            var brush = (SolidColorBrush)FindResource("SolidWindowBackgroundBrush");
             RootBorder.Background = brush;
+
+            // Set context menu background
+            if (RootBorder.ContextMenu != null)
+            {
+                RootBorder.ContextMenu.Background = brush;
+            }
         }
 
         if (DataContext is not MainViewModel vm) return;

@@ -5,6 +5,7 @@
         x:Key="WindowBackgroundBrush"
         Opacity="0.78"
         Color="#1C1C1E" />
+    <SolidColorBrush x:Key="SolidWindowBackgroundBrush" Color="#1C1C1E" />
     <SolidColorBrush x:Key="CardBackgroundBrush" Color="#2C2C2E" />
     <SolidColorBrush x:Key="ForegroundBrush" Color="#F2F2F7" />
     <SolidColorBrush x:Key="MutedForegroundBrush" Color="#8E8E93" />

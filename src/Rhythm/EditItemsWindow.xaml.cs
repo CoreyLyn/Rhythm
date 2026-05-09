@@ -10,13 +10,38 @@ namespace Rhythm;
 public partial class EditItemsWindow : Window
 {
     private readonly MainViewModel _vm;
+    private readonly bool _enableTransparency;
 
-    public EditItemsWindow(MainViewModel vm)
+    public EditItemsWindow(MainViewModel vm, bool enableTransparency = true)
     {
-        InitializeComponent();
         _vm = vm;
+        _enableTransparency = enableTransparency;
+
+        // Set window properties before InitializeComponent
+        if (enableTransparency)
+        {
+            AllowsTransparency = true;
+            Background = Brushes.Transparent;
+        }
+        else
+        {
+            AllowsTransparency = false;
+            Background = (SolidColorBrush)Application.Current.FindResource("SolidWindowBackgroundBrush");
+        }
+
+        InitializeComponent();
         DataContext = _vm;
         ItemsList.ItemsSource = _vm.Items;
+        Loaded += OnLoaded;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        // Set border background based on transparency mode
+        if (!_enableTransparency)
+        {
+            RootBorder.Background = (SolidColorBrush)FindResource("SolidWindowBackgroundBrush");
+        }
     }
 
     private ItemViewModel? Selected => ItemsList.SelectedItem as ItemViewModel;
