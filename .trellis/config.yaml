@@ -57,3 +57,6 @@ max_journal_lines: 2000
 
 # Default package used when --package is not specified.
 # default_package: frontend
+
+codex:
+  dispatch_mode: inline
