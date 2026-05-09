@@ -204,3 +204,36 @@ Brainstorm + 实现 Rhythm v1：WPF + .NET 10 + 模式 C 桌面固定 (HWND_BOTT
 ### Next Steps
 
 - None - task complete
+
+
+## Session 7: Optimize Rhythm About dialog
+
+**Date**: 2026-05-09
+**Task**: Optimize Rhythm About dialog
+**Branch**: `main`
+
+### Summary
+
+Replaced the native About message box with a custom dark rounded WPF dialog matching the main Rhythm UI, verified formatting, Release build, and tests, then archived the rhythm-ui task.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `d690ca1` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
