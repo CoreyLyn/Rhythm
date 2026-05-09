@@ -96,9 +96,8 @@ public partial class App : Application
             if (_viewModel == null) return;
             try
             {
-                var newValue = !miTransparency.IsChecked;
+                var newValue = miTransparency.IsChecked;
                 _viewModel.SetEnableTransparency(newValue);
-                miTransparency.IsChecked = newValue;
                 RecreateMainWindow(newValue);
             }
             catch (Exception ex)
