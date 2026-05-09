@@ -17,6 +17,8 @@
         x:Name="RootBorder"
         Padding="14"
         Background="{StaticResource WindowBackgroundBrush}"
+        BorderBrush="{StaticResource DividerBrush}"
+        BorderThickness="1"
         CornerRadius="10"
         Focusable="True"
         MouseLeftButtonDown="OnBorderMouseLeftButtonDown">
