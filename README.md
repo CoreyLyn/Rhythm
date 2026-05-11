@@ -1,11 +1,8 @@
 # Rhythm
 
-[![CI](https://github.com/corey/Rhythm/actions/workflows/ci.yml/badge.svg)](https://github.com/corey/Rhythm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Rhythm 是一个 Windows 桌面常驻便签，用来放每天重复执行的小清单：勾选今天完成的事项，跨过本地午夜后自动重置，第二天继续从同一份清单开始。它固定在桌面底层，不进入任务栏或 Alt-Tab，适合放在屏幕角落当作轻量提醒。
-
-当前仓库还没有真实应用截图，只有 [`docs/screenshot-placeholder.md`](docs/screenshot-placeholder.md) 作为占位说明；README 暂不渲染不存在的 `docs/screenshot.png`。
 
 ## 适用环境
 
