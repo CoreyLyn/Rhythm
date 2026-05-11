@@ -17,7 +17,7 @@ Rhythm 是一个 Windows 桌面常驻便签，用来放每天重复执行的小�
 - 每日清单：勾选完成项，本地午夜自动把当天完成状态清空
 - 一次性事项：编辑窗口可添加非每日重复事项，完成后跨到第二天自动移除
 - 事项编辑：新增、删除、重命名、上下排序
-- 托盘常驻：双击托盘图标显示窗口，右键菜单提供显示、隐藏、编辑、开机启动、关于和退出
+- 托盘常驻：双击托盘图标显示窗口，右键菜单提供显示、隐藏、编辑、透明效果、开机启动、关于和退出
 - 关闭即隐藏：窗口关闭按钮只隐藏到托盘，只有托盘菜单的 "退出" 会终止进程
 - 位置记忆：窗口可拖动，保存位置；屏幕变化导致位置越界时回退到默认位置
 - 开机启动：托盘菜单可切换，写入当前用户的 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
@@ -36,7 +36,7 @@ Rhythm 是一个 Windows 桌面常驻便签，用来放每天重复执行的小�
 - 运动 20 分钟
 - 读书 30 分钟
 
-可以在托盘菜单 "编辑事项..." 中替换这些示例。
+可以在托盘菜单 "编辑事项..." 中替换这些示例。新增事项时可选择 "每日" 或 "一次性"：每日事项跨日后保留并重置完成状态，一次性事项完成后跨到第二天自动移除。
 
 ## 本地数据
 
@@ -53,6 +53,7 @@ Rhythm 的清单与窗口状态只保存在本机用户目录：
 - `completedToday[]`
 - `lastResetDate`
 - `windowPos`
+- `enableTransparency`
 
 如果状态文件缺失或 JSON 损坏，应用会回退到默认状态；保存采用临时文件替换的方式，降低半写入导致下次启动失败的风险。
 
@@ -112,7 +113,7 @@ dotnet publish src/Rhythm/Rhythm.csproj `
 | 层 | 职责 | 关键文件 |
 |---|---|---|
 | 应用启动与托盘 | 初始化状态、创建主窗口、构建托盘菜单、安排午夜重置 | `src/Rhythm/App.xaml.cs` |
-| 状态机 | 每日重置、勾选、增删改移等纯 C# 逻辑，可单测 | `src/Rhythm/State/RhythmState.cs` |
+| 状态机 | 每日重置、一次性事项跨日移除、勾选、增删改移等纯 C# 逻辑，可单测 | `src/Rhythm/State/RhythmState.cs` |
 | 状态结构 | `state.json` 的 schema 与记录类型 | `src/Rhythm/State/StateSchema.cs` |
 | 持久化 | System.Text.Json 读写，损坏回退默认，保存使用 temp + replace | `src/Rhythm/State/StateStore.cs` |
 | 路径 | `%APPDATA%\Rhythm\state.json` 等本地路径 | `src/Rhythm/AppPaths.cs` |
@@ -130,8 +131,8 @@ dotnet publish src/Rhythm/Rhythm.csproj `
 - 不记录历史完成记录、热力图或连续打卡统计
 - v1 固定暗色外观，不跟随系统暗 / 浅主题切换
 - 不支持全局快捷键
-- 不提供字体、圆角、透明度等用户配置项
+- 不提供字体、圆角等外观细项配置；透明效果仅支持开关
 - 不使用 Mica 背景效果：WPF `AllowsTransparency=True` 与 DWM Mica 互斥，v1 优先保留圆角和全窗透明
 - 不支持 macOS、Linux 或移动端
 
-任务规划与决策记录见 `.trellis/tasks/05-08-rhythm-windows-v1/prd.md`。
+任务规划与决策记录见 `.trellis/tasks/`。
