@@ -417,12 +417,12 @@
                                 x:Name="DailyItemRadio"
                                 Content="每日"
                                 GroupName="NewItemKind"
-                                IsChecked="True"
                                 Style="{StaticResource SegmentRadioButtonStyle}" />
                             <RadioButton
                                 x:Name="OneTimeItemRadio"
                                 Content="一次性"
                                 GroupName="NewItemKind"
+                                IsChecked="True"
                                 Style="{StaticResource SegmentRadioButtonStyle}" />
                         </StackPanel>
                     </Border>
