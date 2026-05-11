@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Check WPF UI changes against project conventions."}
+{"file": ".trellis/spec/frontend/wpf-desktop-app.md", "reason": "Check state-machine separation and WPF integration conventions."}
+{"file": ".trellis/spec/backend/index.md", "reason": "Check state layer and unit test expectations."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared quality thinking guide index."}

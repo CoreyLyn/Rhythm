@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "WPF UI conventions for edit window and desktop app behavior."}
+{"file": ".trellis/spec/frontend/wpf-desktop-app.md", "reason": "State-machine and WPF desktop app integration conventions."}
+{"file": ".trellis/spec/backend/index.md", "reason": "State layer and unit test quality entry point."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared thinking guide index for cross-layer and reuse checks."}
