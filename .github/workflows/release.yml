@@ -28,24 +28,35 @@ jobs:
       - name: Build
         run: dotnet build Rhythm.slnx -c Release --no-restore
 
-      - name: Publish
+      - name: Publish (self-contained)
         run: |
           dotnet publish src/Rhythm/Rhythm.csproj -c Release -r win-x64 `
             -p:PublishSingleFile=true `
             -p:SelfContained=true `
             -p:IncludeNativeLibrariesForSelfExtract=true `
-            -o publish
+            -o publish-sc
+
+      - name: Publish (framework-dependent)
+        run: |
+          dotnet publish src/Rhythm/Rhythm.csproj -c Release -r win-x64 `
+            -p:PublishSingleFile=true `
+            -p:SelfContained=false `
+            -o publish-fdd
 
       - name: Get version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Rename executable
-        run: mv publish/Rhythm.exe publish/Rhythm-${{ steps.version.outputs.VERSION }}.exe
+      - name: Rename executables
+        run: |
+          mv publish-sc/Rhythm.exe publish-sc/Rhythm-${{ steps.version.outputs.VERSION }}-win-x64.exe
+          mv publish-fdd/Rhythm.exe publish-fdd/Rhythm-${{ steps.version.outputs.VERSION }}-win-x64-fdd.exe
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: publish/Rhythm-${{ steps.version.outputs.VERSION }}.exe
+          files: |
+            publish-sc/Rhythm-${{ steps.version.outputs.VERSION }}-win-x64.exe
+            publish-fdd/Rhythm-${{ steps.version.outputs.VERSION }}-win-x64-fdd.exe
           generate_release_notes: true
