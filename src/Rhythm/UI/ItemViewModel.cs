@@ -12,6 +12,8 @@ public sealed class ItemViewModel : INotifyPropertyChanged
 
     public Guid Id { get; }
     public string Text { get; }
+    public RhythmItemKind Kind { get; }
+    public string KindLabel => Kind == RhythmItemKind.OneTime ? "一次性" : "每日";
 
     public bool IsCompleted
     {
@@ -33,6 +35,7 @@ public sealed class ItemViewModel : INotifyPropertyChanged
         _service = service;
         Id = item.Id;
         Text = item.Text;
+        Kind = item.Kind;
         _isCompleted = service.State.CompletedToday.Contains(item.Id);
     }
 

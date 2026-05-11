@@ -3,7 +3,13 @@ using System.Collections.Generic;
 
 namespace Rhythm.State;
 
-public sealed record RhythmItem(Guid Id, string Text);
+public enum RhythmItemKind
+{
+    Daily = 0,
+    OneTime = 1,
+}
+
+public sealed record RhythmItem(Guid Id, string Text, RhythmItemKind Kind = RhythmItemKind.Daily);
 
 public sealed record WindowPos(double X, double Y, double Width, double Height, string ScreenDeviceName);
 

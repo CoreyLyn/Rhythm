@@ -29,7 +29,11 @@ public sealed class StateStoreTests : IDisposable
         var doc = new StateDocument
         {
             SchemaVersion = StateDocument.CurrentSchemaVersion,
-            Items = new() { new RhythmItem(Guid.NewGuid(), "A"), new RhythmItem(Guid.NewGuid(), "B") },
+            Items = new()
+            {
+                new RhythmItem(Guid.NewGuid(), "A"),
+                new RhythmItem(Guid.NewGuid(), "B", RhythmItemKind.OneTime),
+            },
             CompletedToday = new() { Guid.NewGuid() },
             LastResetDate = new DateOnly(2026, 5, 8),
             WindowPos = new WindowPos(10, 20, 300, 400, @"\\.\DISPLAY1"),
@@ -41,10 +45,36 @@ public sealed class StateStoreTests : IDisposable
 
         Assert.Equal(doc.SchemaVersion, loaded.SchemaVersion);
         Assert.Equal(doc.Items.Select(i => i.Text).ToArray(), loaded.Items.Select(i => i.Text).ToArray());
+        Assert.Equal(doc.Items.Select(i => i.Kind).ToArray(), loaded.Items.Select(i => i.Kind).ToArray());
         Assert.Equal(doc.CompletedToday, loaded.CompletedToday);
         Assert.Equal(doc.LastResetDate, loaded.LastResetDate);
         Assert.Equal(doc.WindowPos, loaded.WindowPos);
         Assert.Equal(doc.EnableTransparency, loaded.EnableTransparency);
+    }
+
+    [Fact]
+    public void Load_DefaultsLegacyItemsToDailyKind()
+    {
+        File.WriteAllText(_path, """
+        {
+          "schemaVersion": 1,
+          "items": [
+            {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "text": "Legacy"
+            }
+          ],
+          "completedToday": [],
+          "lastResetDate": "2026-05-08",
+          "enableTransparency": true
+        }
+        """);
+
+        var loaded = StateStore.Load(_path);
+
+        var item = Assert.Single(loaded.Items);
+        Assert.Equal("Legacy", item.Text);
+        Assert.Equal(RhythmItemKind.Daily, item.Kind);
     }
 
     [Fact]

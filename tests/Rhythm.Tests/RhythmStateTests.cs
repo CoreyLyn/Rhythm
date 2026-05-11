@@ -28,6 +28,45 @@ public class RhythmStateTests
     }
 
     [Fact]
+    public void RolloverIfNeeded_KeepsCompletedDailyItems()
+    {
+        var state = NewState();
+        var daily = state.AddItem("Daily", RhythmItemKind.Daily);
+        state.ToggleItem(daily.Id);
+
+        state.RolloverIfNeeded(new DateOnly(2026, 5, 9));
+
+        Assert.Contains(state.Items, i => i.Id == daily.Id);
+        Assert.Empty(state.CompletedToday);
+    }
+
+    [Fact]
+    public void RolloverIfNeeded_RemovesCompletedOneTimeItems()
+    {
+        var state = NewState();
+        var daily = state.AddItem("Daily", RhythmItemKind.Daily);
+        var oneTime = state.AddItem("One time", RhythmItemKind.OneTime);
+        state.ToggleItem(daily.Id);
+        state.ToggleItem(oneTime.Id);
+
+        state.RolloverIfNeeded(new DateOnly(2026, 5, 9));
+
+        Assert.Equal(new[] { daily.Id }, state.Items.Select(i => i.Id).ToArray());
+        Assert.Empty(state.CompletedToday);
+    }
+
+    [Fact]
+    public void RolloverIfNeeded_KeepsIncompleteOneTimeItems()
+    {
+        var state = NewState();
+        var oneTime = state.AddItem("One time", RhythmItemKind.OneTime);
+
+        state.RolloverIfNeeded(new DateOnly(2026, 5, 9));
+
+        Assert.Contains(state.Items, i => i.Id == oneTime.Id);
+    }
+
+    [Fact]
     public void RolloverIfNeeded_IsIdempotentOnSameDay()
     {
         var state = NewState();
@@ -89,10 +128,19 @@ public class RhythmStateTests
     {
         var state = NewState();
         var a = state.AddItem("  hello ");
-        var b = state.AddItem("world");
+        var b = state.AddItem("world", RhythmItemKind.OneTime);
         Assert.Equal("hello", a.Text);
         Assert.NotEqual(a.Id, b.Id);
+        Assert.Equal(RhythmItemKind.Daily, a.Kind);
+        Assert.Equal(RhythmItemKind.OneTime, b.Kind);
         Assert.Equal(2, state.Items.Count);
+    }
+
+    [Fact]
+    public void AddItem_RejectsUnknownKind()
+    {
+        var state = NewState();
+        Assert.Throws<ArgumentException>(() => state.AddItem("A", (RhythmItemKind)999));
     }
 
     [Fact]
@@ -172,6 +220,7 @@ public class RhythmStateTests
 
         Assert.Equal(StateDocument.CurrentSchemaVersion, doc.SchemaVersion);
         Assert.Single(doc.Items);
+        Assert.Equal(RhythmItemKind.Daily, doc.Items[0].Kind);
         Assert.Single(doc.CompletedToday);
         Assert.Equal("DISPLAY1", doc.WindowPos!.ScreenDeviceName);
         Assert.False(doc.EnableTransparency);

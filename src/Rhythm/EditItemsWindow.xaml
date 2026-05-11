@@ -126,6 +126,50 @@
             </Setter>
         </Style>
 
+        <Style x:Key="SegmentRadioButtonStyle" TargetType="RadioButton">
+            <Setter Property="MinWidth" Value="54" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border
+                            x:Name="SegmentBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="Transparent"
+                            CornerRadius="6">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource EditCardHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            x:Key="EditorKindLabelStyle"
+            BasedOn="{StaticResource DialogTextStyle}"
+            TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource MutedForegroundBrush}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Medium" />
+        </Style>
+
         <Style
             x:Key="EditorItemTextStyle"
             BasedOn="{StaticResource DialogTextStyle}"
@@ -231,7 +275,32 @@
                         Style="{StaticResource EditorListBoxStyle}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Style="{StaticResource EditorItemTextStyle}" Text="{Binding Text}" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Style="{StaticResource EditorItemTextStyle}"
+                                        Text="{Binding Text}" />
+                                    <Border
+                                        Grid.Column="1"
+                                        Height="22"
+                                        Margin="10,0,0,0"
+                                        Padding="7,0"
+                                        VerticalAlignment="Center"
+                                        Background="{StaticResource EditInputBackgroundBrush}"
+                                        BorderBrush="{StaticResource DividerBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource EditorKindLabelStyle}"
+                                            Text="{Binding KindLabel}" />
+                                    </Border>
+                                </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
@@ -332,12 +401,36 @@
                     Grid.Column="0"
                     KeyDown="OnNewItemKeyDown"
                     Style="{StaticResource DialogTextBoxStyle}" />
-                <Grid Grid.Column="1" Margin="8,0,0,0">
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="8,0,0,0"
+                    Orientation="Horizontal">
+                    <Border
+                        Margin="0,0,8,0"
+                        Padding="2"
+                        Background="{StaticResource EditInputBackgroundBrush}"
+                        BorderBrush="{StaticResource DividerBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton
+                                x:Name="DailyItemRadio"
+                                Content="每日"
+                                GroupName="NewItemKind"
+                                IsChecked="True"
+                                Style="{StaticResource SegmentRadioButtonStyle}" />
+                            <RadioButton
+                                x:Name="OneTimeItemRadio"
+                                Content="一次性"
+                                GroupName="NewItemKind"
+                                Style="{StaticResource SegmentRadioButtonStyle}" />
+                        </StackPanel>
+                    </Border>
                     <Button
                         Click="OnAdd"
                         Content="+ 添加"
                         Style="{StaticResource PrimaryButtonStyle}" />
-                </Grid>
+                </StackPanel>
             </Grid>
         </Grid>
     </Border>

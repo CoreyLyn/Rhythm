@@ -4,6 +4,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
+using Rhythm.State;
 using Rhythm.UI;
 
 namespace Rhythm;
@@ -132,7 +133,8 @@ public partial class EditItemsWindow : Window
     {
         var text = NewItemText.Text;
         if (string.IsNullOrWhiteSpace(text)) return;
-        var added = _vm.AddItem(text);
+        var kind = OneTimeItemRadio.IsChecked == true ? RhythmItemKind.OneTime : RhythmItemKind.Daily;
+        var added = _vm.AddItem(text, kind);
         NewItemText.Clear();
         ItemsList.SelectedItem = added;
         ItemsList.ScrollIntoView(added);

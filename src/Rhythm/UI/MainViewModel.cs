@@ -66,9 +66,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _service.Persist();
     }
 
-    public ItemViewModel AddItem(string text)
+    public ItemViewModel AddItem(string text, RhythmItemKind kind = RhythmItemKind.Daily)
     {
-        var item = _service.State.AddItem(text);
+        var item = _service.State.AddItem(text, kind);
         var vm = new ItemViewModel(_service, item);
         vm.PropertyChanged += OnItemPropertyChanged;
         Items.Add(vm);

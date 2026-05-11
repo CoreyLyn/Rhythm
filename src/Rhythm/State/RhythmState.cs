@@ -29,6 +29,7 @@ public sealed class RhythmState
     {
         if (today <= LastResetDate)
             return false;
+        _items.RemoveAll(item => item.Kind == RhythmItemKind.OneTime && _completed.Contains(item.Id));
         _completed.Clear();
         LastResetDate = today;
         return true;
@@ -42,12 +43,14 @@ public sealed class RhythmState
             _completed.Remove(id);
     }
 
-    public RhythmItem AddItem(string text)
+    public RhythmItem AddItem(string text, RhythmItemKind kind = RhythmItemKind.Daily)
     {
         var trimmed = (text ?? string.Empty).Trim();
         if (string.IsNullOrEmpty(trimmed))
             throw new ArgumentException("Item text cannot be empty or whitespace.", nameof(text));
-        var item = new RhythmItem(Guid.NewGuid(), trimmed);
+        if (!Enum.IsDefined(kind))
+            throw new ArgumentException($"Unknown item kind: {kind}", nameof(kind));
+        var item = new RhythmItem(Guid.NewGuid(), trimmed, kind);
         _items.Add(item);
         return item;
     }

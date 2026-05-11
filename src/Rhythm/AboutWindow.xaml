@@ -183,7 +183,7 @@
                         <TextBlock
                             Margin="0,6,0,0"
                             Style="{StaticResource AboutHintStyle}"
-                            Text="勾选完成，每日自动重置。保持在桌面一角，记录今天真正要完成的节奏。" />
+                            Text="每日事项自动重置，一次性事项完成后次日移除。保持在桌面一角，记录今天真正要完成的节奏。" />
                     </StackPanel>
                 </Grid>
             </Border>
