@@ -10,6 +10,8 @@
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     SizeToContent="Height"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True"
     WindowStartupLocation="Manual"
     WindowStyle="None">
 
@@ -21,7 +23,8 @@
         BorderThickness="1"
         CornerRadius="10"
         Focusable="True"
-        MouseLeftButtonDown="OnBorderMouseLeftButtonDown">
+        MouseLeftButtonDown="OnBorderMouseLeftButtonDown"
+        SnapsToDevicePixels="True">
         <Border.ContextMenu>
             <ContextMenu>
                 <MenuItem Click="OnEditClick" Header="编辑事项..." />

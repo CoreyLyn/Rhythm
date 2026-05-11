@@ -5,7 +5,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Shell;
 using System.Windows.Threading;
 using Rhythm.Interop;
 using Rhythm.State;
@@ -33,15 +32,6 @@ public partial class MainWindow : Window
         {
             AllowsTransparency = false;
             Background = (SolidColorBrush)Application.Current.FindResource("SolidWindowBackgroundBrush");
-
-            // Use WindowChrome for rounded corners in non-transparent mode
-            WindowChrome.SetWindowChrome(this, new WindowChrome
-            {
-                CornerRadius = new CornerRadius(10),
-                GlassFrameThickness = new Thickness(0),
-                ResizeBorderThickness = new Thickness(0),
-                CaptionHeight = 0
-            });
         }
 
         InitializeComponent();
