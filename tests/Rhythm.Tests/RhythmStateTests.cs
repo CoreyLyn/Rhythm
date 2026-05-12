@@ -209,6 +209,50 @@ public class RhythmStateTests
     }
 
     [Fact]
+    public void MoveItemTo_MovesItemToSpecifiedIndex()
+    {
+        var state = NewState();
+        var a = state.AddItem("A");
+        var b = state.AddItem("B");
+        var c = state.AddItem("C");
+
+        state.MoveItemTo(c.Id, 0);
+        Assert.Equal(new[] { c.Id, a.Id, b.Id }, state.Items.Select(i => i.Id).ToArray());
+
+        state.MoveItemTo(c.Id, 2);
+        Assert.Equal(new[] { a.Id, b.Id, c.Id }, state.Items.Select(i => i.Id).ToArray());
+    }
+
+    [Fact]
+    public void MoveItemTo_NoOpWhenIndexEqualsCurrent()
+    {
+        var state = NewState();
+        var a = state.AddItem("A");
+        var b = state.AddItem("B");
+
+        state.MoveItemTo(a.Id, 0);
+        Assert.Equal(new[] { a.Id, b.Id }, state.Items.Select(i => i.Id).ToArray());
+    }
+
+    [Fact]
+    public void MoveItemTo_ThrowsForOutOfRange()
+    {
+        var state = NewState();
+        var a = state.AddItem("A");
+        state.AddItem("B");
+        Assert.Throws<ArgumentException>(() => state.MoveItemTo(a.Id, -1));
+        Assert.Throws<ArgumentException>(() => state.MoveItemTo(a.Id, 2));
+    }
+
+    [Fact]
+    public void MoveItemTo_ThrowsForUnknownId()
+    {
+        var state = NewState();
+        state.AddItem("A");
+        Assert.Throws<ArgumentException>(() => state.MoveItemTo(Guid.NewGuid(), 0));
+    }
+
+    [Fact]
     public void ToDocument_RoundtripsMutations()
     {
         var state = NewState();

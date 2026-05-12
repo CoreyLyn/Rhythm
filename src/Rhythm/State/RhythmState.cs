@@ -88,6 +88,20 @@ public sealed class RhythmState
         (_items[idx], _items[newIdx]) = (_items[newIdx], _items[idx]);
     }
 
+    public void MoveItemTo(Guid id, int newIndex)
+    {
+        var idx = _items.FindIndex(i => i.Id == id);
+        if (idx < 0)
+            throw new ArgumentException($"Unknown item id: {id}", nameof(id));
+        if (newIndex < 0 || newIndex >= _items.Count)
+            throw new ArgumentException($"Index out of range: {newIndex}", nameof(newIndex));
+        if (newIndex == idx)
+            return;
+        var item = _items[idx];
+        _items.RemoveAt(idx);
+        _items.Insert(newIndex, item);
+    }
+
     public void SetWindowPos(WindowPos? pos) => WindowPos = pos;
 
     public void SetEnableTransparency(bool enabled) => EnableTransparency = enabled;
