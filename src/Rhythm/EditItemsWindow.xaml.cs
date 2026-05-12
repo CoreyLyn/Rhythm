@@ -99,6 +99,30 @@ public partial class EditItemsWindow : Window
         DragMove();
     }
 
+    private void OnKindBadgeClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is ItemViewModel itemVm)
+        {
+            var newKind = itemVm.Kind == RhythmItemKind.Daily
+                ? RhythmItemKind.OneTime
+                : RhythmItemKind.Daily;
+            _vm.ChangeKind(itemVm, newKind);
+        }
+    }
+
+    private void OnDeleteClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is ItemViewModel itemVm)
+        {
+            _vm.RemoveItem(itemVm);
+        }
+    }
+
+    private void OnItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        // Implemented in Task 8 (inline editing).
+    }
+
     private static T? FindAncestor<T>(DependencyObject? current)
         where T : DependencyObject
     {
