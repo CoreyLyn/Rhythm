@@ -85,14 +85,27 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public void RenameItem(ItemViewModel itemVm, string newText)
     {
+        _service.State.RenameItem(itemVm.Id, newText);
+        var renamed = _service.State.Items.Single(i => i.Id == itemVm.Id);
+        itemVm.UpdateText(renamed.Text);
+        _service.Persist();
+    }
+
+    public void MoveItemTo(ItemViewModel itemVm, int newIndex)
+    {
         var idx = Items.IndexOf(itemVm);
         if (idx < 0) return;
-        _service.State.RenameItem(itemVm.Id, newText);
-        var renamed = _service.State.Items[idx];
-        itemVm.PropertyChanged -= OnItemPropertyChanged;
-        var newVm = new ItemViewModel(_service, renamed);
-        newVm.PropertyChanged += OnItemPropertyChanged;
-        Items[idx] = newVm;
+        if (newIndex < 0 || newIndex >= Items.Count) return;
+        if (newIndex == idx) return;
+        _service.State.MoveItemTo(itemVm.Id, newIndex);
+        Items.Move(idx, newIndex);
+        _service.Persist();
+    }
+
+    public void ChangeKind(ItemViewModel itemVm, RhythmItemKind newKind)
+    {
+        _service.State.ChangeKind(itemVm.Id, newKind);
+        itemVm.UpdateKind(newKind);
         _service.Persist();
     }
 

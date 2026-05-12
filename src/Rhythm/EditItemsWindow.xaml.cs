@@ -55,63 +55,7 @@ public partial class EditItemsWindow : Window
         }
     }
 
-    private ItemViewModel? Selected => ItemsList.SelectedItem as ItemViewModel;
-
-    private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        EditTextBox.Text = Selected?.Text ?? string.Empty;
-        RefreshSelectionActions();
-    }
-
-    private void OnRename(object sender, RoutedEventArgs e)
-    {
-        if (Selected is not { } v) return;
-        var idx = ItemsList.SelectedIndex;
-        var text = EditTextBox.Text?.Trim();
-        if (string.IsNullOrEmpty(text)) return;
-        _vm.RenameItem(v, text);
-        if (idx >= 0 && idx < _vm.Items.Count)
-        {
-            var renamed = _vm.Items[idx];
-            ItemsList.SelectedItem = renamed;
-            ItemsList.ScrollIntoView(renamed);
-        }
-
-        RefreshSelectionActions();
-    }
-
-    private void OnMoveUp(object sender, RoutedEventArgs e)
-    {
-        // Replaced in Task 5
-    }
-
-    private void OnMoveDown(object sender, RoutedEventArgs e)
-    {
-        // Replaced in Task 5
-    }
-
-    private void OnRemove(object sender, RoutedEventArgs e)
-    {
-        if (Selected is not { } v) return;
-
-        var idx = ItemsList.SelectedIndex;
-        _vm.RemoveItem(v);
-
-        if (_vm.Items.Count > 0)
-            ItemsList.SelectedIndex = Math.Min(idx, _vm.Items.Count - 1);
-
-        RefreshSelectionActions();
-    }
-
     private void OnAdd(object sender, RoutedEventArgs e) => DoAdd();
-
-    private void OnEditItemKeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key != Key.Enter) return;
-
-        OnRename(sender, e);
-        e.Handled = true;
-    }
 
     private void OnNewItemKeyDown(object sender, KeyEventArgs e)
     {
@@ -130,21 +74,6 @@ public partial class EditItemsWindow : Window
         NewItemText.Clear();
         ItemsList.SelectedItem = added;
         ItemsList.ScrollIntoView(added);
-        EditTextBox.Focus();
-        EditTextBox.SelectAll();
-        RefreshSelectionActions();
-    }
-
-    private void RefreshSelectionActions()
-    {
-        var selectedIndex = ItemsList.SelectedIndex;
-        var hasSelection = selectedIndex >= 0;
-
-        EditTextBox.IsEnabled = hasSelection;
-        RenameButton.IsEnabled = hasSelection;
-        RemoveButton.IsEnabled = hasSelection;
-        MoveUpButton.IsEnabled = hasSelection && selectedIndex > 0;
-        MoveDownButton.IsEnabled = hasSelection && selectedIndex < _vm.Items.Count - 1;
     }
 
     private void OnCloseClick(object sender, RoutedEventArgs e) => Close();

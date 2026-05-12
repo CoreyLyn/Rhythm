@@ -236,7 +236,6 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Margin="0,0,0,16">
@@ -271,7 +270,6 @@
                 <Grid>
                     <ListBox
                         x:Name="ItemsList"
-                        SelectionChanged="OnSelectionChanged"
                         Style="{StaticResource EditorListBoxStyle}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -314,83 +312,7 @@
                 </Grid>
             </Border>
 
-            <Border
-                Grid.Row="2"
-                Margin="0,12,0,0"
-                Padding="12"
-                Background="{StaticResource EditSurfaceBrush}"
-                CornerRadius="10">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <TextBlock
-                        Grid.Row="0"
-                        Margin="0,0,0,8"
-                        Style="{StaticResource DialogHintStyle}"
-                        Text="选中事项" />
-
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBox
-                            x:Name="EditTextBox"
-                            Grid.Column="0"
-                            MinWidth="120"
-                            IsEnabled="False"
-                            KeyDown="OnEditItemKeyDown"
-                            Style="{StaticResource DialogTextBoxStyle}" />
-                        <Button
-                            x:Name="RenameButton"
-                            Grid.Column="1"
-                            Margin="8,0,0,0"
-                            Click="OnRename"
-                            Content="重命名"
-                            IsEnabled="False"
-                            Style="{StaticResource DialogButtonStyle}" />
-                        <Button
-                            x:Name="MoveUpButton"
-                            Grid.Column="2"
-                            Width="34"
-                            Margin="8,0,0,0"
-                            Padding="0"
-                            Click="OnMoveUp"
-                            Content="↑"
-                            IsEnabled="False"
-                            Style="{StaticResource DialogButtonStyle}"
-                            ToolTip="上移" />
-                        <Button
-                            x:Name="MoveDownButton"
-                            Grid.Column="3"
-                            Width="34"
-                            Margin="6,0,0,0"
-                            Padding="0"
-                            Click="OnMoveDown"
-                            Content="↓"
-                            IsEnabled="False"
-                            Style="{StaticResource DialogButtonStyle}"
-                            ToolTip="下移" />
-                        <Button
-                            x:Name="RemoveButton"
-                            Grid.Column="4"
-                            Margin="8,0,0,0"
-                            Click="OnRemove"
-                            Content="删除"
-                            IsEnabled="False"
-                            Style="{StaticResource DangerButtonStyle}" />
-                    </Grid>
-                </Grid>
-            </Border>
-
-            <Grid Grid.Row="3" Margin="0,12,0,0">
+            <Grid Grid.Row="2" Margin="0,12,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
