@@ -120,7 +120,66 @@ public partial class EditItemsWindow : Window
 
     private void OnItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        // Implemented in Task 8 (inline editing).
+        if (e.OriginalSource is not DependencyObject source) return;
+        if (FindAncestor<Button>(source) != null) return;
+        if (sender is not ListBoxItem listItem) return;
+        if (listItem.DataContext is not ItemViewModel itemVm) return;
+        if (itemVm.IsEditing) return;
+
+        itemVm.IsEditing = true;
+        e.Handled = true;
+    }
+
+    private void OnEditTextBoxLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is not TextBox tb) return;
+        if (tb.DataContext is not ItemViewModel itemVm) return;
+        if (!itemVm.IsEditing) return;
+        tb.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, () =>
+        {
+            tb.Focus();
+            tb.SelectAll();
+        });
+    }
+
+    private void OnEditTextBoxKeyDown(object sender, KeyEventArgs e)
+    {
+        if (sender is not TextBox tb) return;
+        if (tb.DataContext is not ItemViewModel itemVm) return;
+
+        if (e.Key == Key.Enter)
+        {
+            CommitInlineEdit(itemVm, tb);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape)
+        {
+            tb.Text = itemVm.Text;
+            itemVm.IsEditing = false;
+            e.Handled = true;
+        }
+    }
+
+    private void OnEditTextBoxLostFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is not TextBox tb) return;
+        if (tb.DataContext is not ItemViewModel itemVm) return;
+        if (!itemVm.IsEditing) return;
+        CommitInlineEdit(itemVm, tb);
+    }
+
+    private void CommitInlineEdit(ItemViewModel itemVm, TextBox tb)
+    {
+        var newText = tb.Text?.Trim() ?? string.Empty;
+        if (!string.IsNullOrEmpty(newText) && newText != itemVm.Text)
+        {
+            _vm.RenameItem(itemVm, newText);
+        }
+        else
+        {
+            tb.Text = itemVm.Text;
+        }
+        itemVm.IsEditing = false;
     }
 
     private static T? FindAncestor<T>(DependencyObject? current)

@@ -355,11 +355,20 @@
                                             Text="≡" />
                                     </Border>
 
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        VerticalAlignment="Center"
-                                        Style="{StaticResource EditorItemTextStyle}"
-                                        Text="{Binding Text}" />
+                                    <Grid Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock
+                                            Style="{StaticResource EditorItemTextStyle}"
+                                            Text="{Binding Text}"
+                                            Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                                        <TextBox
+                                            x:Name="InlineEditTextBox"
+                                            KeyDown="OnEditTextBoxKeyDown"
+                                            Loaded="OnEditTextBoxLoaded"
+                                            LostFocus="OnEditTextBoxLostFocus"
+                                            Style="{StaticResource DialogTextBoxStyle}"
+                                            Text="{Binding Text, Mode=OneWay}"
+                                            Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                    </Grid>
 
                                     <Button
                                         Grid.Column="2"
