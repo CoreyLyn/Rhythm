@@ -253,6 +253,50 @@ public class RhythmStateTests
     }
 
     [Fact]
+    public void ChangeKind_UpdatesKindWithoutTouchingCompletion()
+    {
+        var state = NewState();
+        var a = state.AddItem("A", RhythmItemKind.Daily);
+        state.ToggleItem(a.Id);
+
+        state.ChangeKind(a.Id, RhythmItemKind.OneTime);
+
+        var updated = state.Items.Single(i => i.Id == a.Id);
+        Assert.Equal(RhythmItemKind.OneTime, updated.Kind);
+        Assert.Contains(a.Id, state.CompletedToday);
+    }
+
+    [Fact]
+    public void ChangeKind_ThrowsForUnknownId()
+    {
+        var state = NewState();
+        Assert.Throws<ArgumentException>(() =>
+            state.ChangeKind(Guid.NewGuid(), RhythmItemKind.Daily));
+    }
+
+    [Fact]
+    public void ChangeKind_RejectsUnknownKind()
+    {
+        var state = NewState();
+        var a = state.AddItem("A");
+        Assert.Throws<ArgumentException>(() =>
+            state.ChangeKind(a.Id, (RhythmItemKind)999));
+    }
+
+    [Fact]
+    public void ChangeKind_FollowedByRolloverRemovesIfCompleted()
+    {
+        var state = NewState();
+        var a = state.AddItem("A", RhythmItemKind.Daily);
+        state.ToggleItem(a.Id);
+        state.ChangeKind(a.Id, RhythmItemKind.OneTime);
+
+        state.RolloverIfNeeded(new DateOnly(2026, 5, 9));
+
+        Assert.DoesNotContain(state.Items, i => i.Id == a.Id);
+    }
+
+    [Fact]
     public void ToDocument_RoundtripsMutations()
     {
         var state = NewState();

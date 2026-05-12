@@ -102,6 +102,16 @@ public sealed class RhythmState
         _items.Insert(newIndex, item);
     }
 
+    public void ChangeKind(Guid id, RhythmItemKind newKind)
+    {
+        if (!Enum.IsDefined(newKind))
+            throw new ArgumentException($"Unknown item kind: {newKind}", nameof(newKind));
+        var idx = _items.FindIndex(i => i.Id == id);
+        if (idx < 0)
+            throw new ArgumentException($"Unknown item id: {id}", nameof(id));
+        _items[idx] = _items[idx] with { Kind = newKind };
+    }
+
     public void SetWindowPos(WindowPos? pos) => WindowPos = pos;
 
     public void SetEnableTransparency(bool enabled) => EnableTransparency = enabled;
