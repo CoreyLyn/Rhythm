@@ -1,6 +1,8 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
@@ -13,6 +15,9 @@ public partial class EditItemsWindow : Window
 {
     private readonly MainViewModel _vm;
     private readonly bool _enableTransparency;
+    private Point? _dragStart;
+    private ItemViewModel? _dragItem;
+    private DropLineAdorner? _dropAdorner;
 
     public EditItemsWindow(MainViewModel vm, bool enableTransparency = true)
     {
@@ -180,6 +185,122 @@ public partial class EditItemsWindow : Window
             tb.Text = itemVm.Text;
         }
         itemVm.IsEditing = false;
+    }
+
+    private void OnDragHandlePreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Left) return;
+        if (sender is not FrameworkElement fe) return;
+        if (fe.DataContext is not ItemViewModel itemVm) return;
+        _dragStart = e.GetPosition(null);
+        _dragItem = itemVm;
+    }
+
+    private void OnDragHandlePreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (_dragStart is not { } start || _dragItem is null) return;
+        if (e.LeftButton != MouseButtonState.Pressed)
+        {
+            _dragStart = null;
+            _dragItem = null;
+            return;
+        }
+
+        var pos = e.GetPosition(null);
+        if (Math.Abs(pos.X - start.X) < SystemParameters.MinimumHorizontalDragDistance &&
+            Math.Abs(pos.Y - start.Y) < SystemParameters.MinimumVerticalDragDistance)
+            return;
+
+        var item = _dragItem;
+        var data = new DataObject(typeof(ItemViewModel), item);
+        DragDrop.DoDragDrop((DependencyObject)sender, data, DragDropEffects.Move);
+
+        _dragStart = null;
+        _dragItem = null;
+        _dropAdorner?.Hide();
+    }
+
+    private void OnListBoxDragOver(object sender, DragEventArgs e)
+    {
+        if (!e.Data.GetDataPresent(typeof(ItemViewModel)))
+        {
+            e.Effects = DragDropEffects.None;
+            return;
+        }
+        e.Effects = DragDropEffects.Move;
+
+        EnsureDropAdorner();
+        var y = ComputeDropLineY(e);
+        _dropAdorner?.Show(y);
+        e.Handled = true;
+    }
+
+    private void OnListBoxDragLeave(object sender, DragEventArgs e)
+    {
+        _dropAdorner?.Hide();
+    }
+
+    private void OnListBoxDrop(object sender, DragEventArgs e)
+    {
+        _dropAdorner?.Hide();
+        if (e.Data.GetData(typeof(ItemViewModel)) is not ItemViewModel dragged) return;
+        var newIndex = ComputeDropIndex(e, dragged);
+        if (newIndex < 0) return;
+        _vm.MoveItemTo(dragged, newIndex);
+        e.Handled = true;
+    }
+
+    private void EnsureDropAdorner()
+    {
+        if (_dropAdorner != null) return;
+        var layer = AdornerLayer.GetAdornerLayer(ItemsList);
+        if (layer == null) return;
+        _dropAdorner = new DropLineAdorner(ItemsList, (Brush)FindResource("AccentBrush"));
+        layer.Add(_dropAdorner);
+    }
+
+    private int ComputeDropIndex(DragEventArgs e, ItemViewModel dragged)
+    {
+        var target = FindListBoxItemUnderMouse(e);
+        int draggedIdx = _vm.Items.IndexOf(dragged);
+        if (draggedIdx < 0) return -1;
+
+        if (target is null || target.DataContext is not ItemViewModel targetVm)
+        {
+            return _vm.Items.Count - 1;
+        }
+
+        int targetIdx = _vm.Items.IndexOf(targetVm);
+        if (targetIdx < 0) return -1;
+
+        var pos = e.GetPosition(target);
+        bool insertAfter = pos.Y > target.ActualHeight / 2;
+        int insertIdx = insertAfter ? targetIdx + 1 : targetIdx;
+        if (draggedIdx < insertIdx) insertIdx--;
+        if (insertIdx < 0) insertIdx = 0;
+        if (insertIdx >= _vm.Items.Count) insertIdx = _vm.Items.Count - 1;
+        return insertIdx;
+    }
+
+    private double ComputeDropLineY(DragEventArgs e)
+    {
+        var target = FindListBoxItemUnderMouse(e);
+        if (target is null)
+        {
+            var lastIdx = _vm.Items.Count - 1;
+            if (lastIdx < 0) return 0;
+            if (ItemsList.ItemContainerGenerator.ContainerFromIndex(lastIdx) is not ListBoxItem last) return 0;
+            return last.TranslatePoint(new Point(0, last.ActualHeight), ItemsList).Y;
+        }
+        var pos = e.GetPosition(target);
+        bool insertAfter = pos.Y > target.ActualHeight / 2;
+        return target.TranslatePoint(new Point(0, insertAfter ? target.ActualHeight : 0), ItemsList).Y;
+    }
+
+    private ListBoxItem? FindListBoxItemUnderMouse(DragEventArgs e)
+    {
+        if (ItemsList.InputHitTest(e.GetPosition(ItemsList)) is not DependencyObject hit) return null;
+        return FindAncestor<ListBoxItem>(hit);
     }
 
     private static T? FindAncestor<T>(DependencyObject? current)

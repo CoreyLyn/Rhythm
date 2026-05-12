@@ -332,6 +332,10 @@
                 <Grid>
                     <ListBox
                         x:Name="ItemsList"
+                        AllowDrop="True"
+                        DragLeave="OnListBoxDragLeave"
+                        DragOver="OnListBoxDragOver"
+                        Drop="OnListBoxDrop"
                         Style="{StaticResource EditorListBoxStyle}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -346,6 +350,8 @@
                                     <Border
                                         Grid.Column="0"
                                         Margin="0,0,8,0"
+                                        PreviewMouseLeftButtonDown="OnDragHandlePreviewMouseDown"
+                                        PreviewMouseMove="OnDragHandlePreviewMouseMove"
                                         Style="{StaticResource DragHandleStyle}">
                                         <TextBlock
                                             HorizontalAlignment="Center"
