@@ -75,19 +75,6 @@ public sealed class RhythmState
         _items[idx] = _items[idx] with { Text = trimmed };
     }
 
-    public void MoveItem(Guid id, int delta)
-    {
-        if (delta != -1 && delta != 1)
-            throw new ArgumentException("Delta must be -1 (up) or +1 (down).", nameof(delta));
-        var idx = _items.FindIndex(i => i.Id == id);
-        if (idx < 0)
-            throw new ArgumentException($"Unknown item id: {id}", nameof(id));
-        var newIdx = idx + delta;
-        if (newIdx < 0 || newIdx >= _items.Count)
-            return;
-        (_items[idx], _items[newIdx]) = (_items[newIdx], _items[idx]);
-    }
-
     public void MoveItemTo(Guid id, int newIndex)
     {
         var idx = _items.FindIndex(i => i.Id == id);

@@ -96,17 +96,6 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _service.Persist();
     }
 
-    public void MoveItem(ItemViewModel itemVm, int delta)
-    {
-        var idx = Items.IndexOf(itemVm);
-        if (idx < 0) return;
-        var newIdx = idx + delta;
-        if (newIdx < 0 || newIdx >= Items.Count) return;
-        _service.State.MoveItem(itemVm.Id, delta);
-        Items.Move(idx, newIdx);
-        _service.Persist();
-    }
-
     public void RolloverAndRefresh()
     {
         var changed = _service.State.RolloverIfNeeded(DateOnly.FromDateTime(DateTime.Today));

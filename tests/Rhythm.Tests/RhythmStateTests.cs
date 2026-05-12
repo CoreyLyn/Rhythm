@@ -180,35 +180,6 @@ public class RhythmStateTests
     }
 
     [Fact]
-    public void MoveItem_UpAndDownReorders()
-    {
-        var state = NewState();
-        var a = state.AddItem("A");
-        var b = state.AddItem("B");
-        var c = state.AddItem("C");
-
-        state.MoveItem(b.Id, -1);
-        Assert.Equal(new[] { b.Id, a.Id, c.Id }, state.Items.Select(i => i.Id).ToArray());
-
-        state.MoveItem(b.Id, 1);
-        Assert.Equal(new[] { a.Id, b.Id, c.Id }, state.Items.Select(i => i.Id).ToArray());
-    }
-
-    [Fact]
-    public void MoveItem_ClampsAtEdges()
-    {
-        var state = NewState();
-        var a = state.AddItem("A");
-        var b = state.AddItem("B");
-
-        state.MoveItem(a.Id, -1);
-        Assert.Equal(new[] { a.Id, b.Id }, state.Items.Select(i => i.Id).ToArray());
-
-        state.MoveItem(b.Id, 1);
-        Assert.Equal(new[] { a.Id, b.Id }, state.Items.Select(i => i.Id).ToArray());
-    }
-
-    [Fact]
     public void MoveItemTo_MovesItemToSpecifiedIndex()
     {
         var state = NewState();

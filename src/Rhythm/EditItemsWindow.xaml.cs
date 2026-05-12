@@ -82,20 +82,12 @@ public partial class EditItemsWindow : Window
 
     private void OnMoveUp(object sender, RoutedEventArgs e)
     {
-        if (Selected is not { } v) return;
-        _vm.MoveItem(v, -1);
-        ItemsList.SelectedItem = v;
-        ItemsList.ScrollIntoView(v);
-        RefreshSelectionActions();
+        // Replaced in Task 5
     }
 
     private void OnMoveDown(object sender, RoutedEventArgs e)
     {
-        if (Selected is not { } v) return;
-        _vm.MoveItem(v, +1);
-        ItemsList.SelectedItem = v;
-        ItemsList.ScrollIntoView(v);
-        RefreshSelectionActions();
+        // Replaced in Task 5
     }
 
     private void OnRemove(object sender, RoutedEventArgs e)
