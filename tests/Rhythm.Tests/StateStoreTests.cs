@@ -24,7 +24,7 @@ public sealed class StateStoreTests : IDisposable
     }
 
     [Fact]
-    public void Save_Then_Load_RoundTripsAllFields()
+    public void Save_Then_Load_RoundTripsPomodoroFields()
     {
         var doc = new StateDocument
         {
@@ -46,7 +46,7 @@ public sealed class StateStoreTests : IDisposable
                 LongBreakEvery = 3,
                 AutoStartNextPhase = false,
             },
-            PomodoroSession = new PomodoroSessionState
+            PomodoroSession = new PomodoroSessionSnapshot
             {
                 Status = PomodoroStatus.Paused,
                 PhaseType = PomodoroPhaseType.ShortBreak,
@@ -99,7 +99,7 @@ public sealed class StateStoreTests : IDisposable
     }
 
     [Fact]
-    public void Load_DefaultsLegacyPomodoroFields()
+    public void Load_LegacyDocument_GetsDefaultPomodoroValues()
     {
         File.WriteAllText(_path, """
         {
@@ -114,7 +114,7 @@ public sealed class StateStoreTests : IDisposable
         var loaded = StateStore.Load(_path);
 
         Assert.Equal(new PomodoroConfig(), loaded.PomodoroConfig);
-        Assert.Equal(new PomodoroSessionState(), loaded.PomodoroSession);
+        Assert.Equal(new PomodoroSessionSnapshot(), loaded.PomodoroSession);
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public sealed class StateStoreTests : IDisposable
         Assert.Empty(loaded.CompletedToday);
         Assert.True(loaded.EnableTransparency); // Default value
         Assert.Equal(new PomodoroConfig(), loaded.PomodoroConfig);
-        Assert.Equal(new PomodoroSessionState(), loaded.PomodoroSession);
+        Assert.Equal(new PomodoroSessionSnapshot(), loaded.PomodoroSession);
     }
 
     [Fact]

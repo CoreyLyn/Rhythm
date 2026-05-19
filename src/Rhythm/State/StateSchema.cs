@@ -15,7 +15,7 @@ public sealed record WindowPos(double X, double Y, double Width, double Height, 
 
 public sealed class StateDocument
 {
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
 
     public int SchemaVersion { get; init; } = CurrentSchemaVersion;
     public List<RhythmItem> Items { get; init; } = new();
@@ -24,5 +24,5 @@ public sealed class StateDocument
     public WindowPos? WindowPos { get; init; }
     public bool EnableTransparency { get; init; } = true;
     public PomodoroConfig PomodoroConfig { get; init; } = new();
-    public PomodoroSessionState PomodoroSession { get; init; } = new();
+    public PomodoroSessionSnapshot PomodoroSession { get; init; } = new();
 }

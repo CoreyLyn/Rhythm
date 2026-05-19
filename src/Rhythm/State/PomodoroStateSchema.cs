@@ -23,7 +23,7 @@ public sealed record PomodoroConfig(
     int LongBreakEvery = 4,
     bool AutoStartNextPhase = true);
 
-public sealed record PomodoroSessionState(
+public sealed record PomodoroSessionSnapshot(
     PomodoroStatus Status = PomodoroStatus.Idle,
     PomodoroPhaseType PhaseType = PomodoroPhaseType.Focus,
     int RemainingSeconds = 0,
