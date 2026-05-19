@@ -33,6 +33,28 @@ public sealed class PomodoroStateMachineTests
     }
 
     [Fact]
+    public void Start_NoOpWhenSessionIsNotIdle()
+    {
+        var existing = new PomodoroSessionSnapshot(
+            PomodoroStatus.Paused,
+            PomodoroPhaseType.Focus,
+            1234,
+            1,
+            2,
+            Guid.NewGuid(),
+            StartTime,
+            StartTime.AddMinutes(4));
+        var machine = new PomodoroStateMachine(
+            new PomodoroConfig(FocusMinutes: 30),
+            existing);
+
+        var session = machine.Start(StartTime.AddMinutes(10), Guid.NewGuid());
+
+        Assert.Equal(existing, session);
+        Assert.Equal(existing, machine.Session);
+    }
+
+    [Fact]
     public void Pause_FreezesRemainingSeconds()
     {
         var machine = new PomodoroStateMachine(
@@ -78,6 +100,27 @@ public sealed class PomodoroStateMachineTests
     }
 
     [Fact]
+    public void AdvanceTo_AccumulatesSubSecondTicksUntilAWholeSecondElapses()
+    {
+        var machine = new PomodoroStateMachine(
+            new PomodoroConfig(FocusMinutes: 25),
+            new PomodoroSessionSnapshot());
+
+        machine.Start(StartTime);
+
+        var after400ms = machine.AdvanceTo(StartTime.AddMilliseconds(400));
+        var after800ms = machine.AdvanceTo(StartTime.AddMilliseconds(800));
+        var after1200ms = machine.AdvanceTo(StartTime.AddMilliseconds(1200));
+
+        Assert.Equal(1500, after400ms.RemainingSeconds);
+        Assert.Equal(StartTime, after400ms.LastUpdatedAt);
+        Assert.Equal(1500, after800ms.RemainingSeconds);
+        Assert.Equal(StartTime, after800ms.LastUpdatedAt);
+        Assert.Equal(1499, after1200ms.RemainingSeconds);
+        Assert.Equal(StartTime.AddMilliseconds(1200), after1200ms.LastUpdatedAt);
+    }
+
+    [Fact]
     public void Reset_ReturnsToIdleFocusAndClearsLinkedItem()
     {
         var machine = new PomodoroStateMachine(
@@ -99,7 +142,7 @@ public sealed class PomodoroStateMachineTests
                 PomodoroStatus.Idle,
                 PomodoroPhaseType.Focus,
                 1500,
-                2,
+                0,
                 5,
                 null,
                 null,

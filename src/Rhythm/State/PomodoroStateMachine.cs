@@ -16,6 +16,9 @@ public sealed class PomodoroStateMachine
 
     public PomodoroSessionSnapshot Start(DateTimeOffset now, Guid? linkedItemId = null)
     {
+        if (Session.Status != PomodoroStatus.Idle)
+            return Session;
+
         Session = Session with
         {
             Status = PomodoroStatus.Running,
@@ -65,6 +68,7 @@ public sealed class PomodoroStateMachine
             Status = PomodoroStatus.Idle,
             PhaseType = PomodoroPhaseType.Focus,
             RemainingSeconds = GetPhaseDurationSeconds(PomodoroPhaseType.Focus),
+            CompletedFocusCountInCycle = 0,
             LinkedItemId = null,
             PhaseStartedAt = null,
             LastUpdatedAt = null,
@@ -94,6 +98,10 @@ public sealed class PomodoroStateMachine
 
         var baseline = Session.LastUpdatedAt ?? Session.PhaseStartedAt.Value;
         var elapsedSeconds = (int)Math.Max(0, (now - baseline).TotalSeconds);
+
+        if (elapsedSeconds <= 0)
+            return Session;
+
         var remainingSeconds = Math.Max(0, Session.RemainingSeconds - elapsedSeconds);
 
         return Session with
