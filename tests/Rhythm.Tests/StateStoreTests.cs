@@ -38,6 +38,25 @@ public sealed class StateStoreTests : IDisposable
             LastResetDate = new DateOnly(2026, 5, 8),
             WindowPos = new WindowPos(10, 20, 300, 400, @"\\.\DISPLAY1"),
             EnableTransparency = false,
+            PomodoroConfig = new PomodoroConfig
+            {
+                FocusMinutes = 50,
+                ShortBreakMinutes = 10,
+                LongBreakMinutes = 30,
+                LongBreakEvery = 3,
+                AutoStartNextPhase = false,
+            },
+            PomodoroSession = new PomodoroSessionState
+            {
+                Status = PomodoroStatus.Paused,
+                PhaseType = PomodoroPhaseType.ShortBreak,
+                RemainingSeconds = 123,
+                CompletedFocusCountInCycle = 2,
+                CompletedFocusCountToday = 7,
+                LinkedItemId = Guid.NewGuid(),
+                PhaseStartedAt = new DateTimeOffset(2026, 5, 8, 9, 0, 0, TimeSpan.FromHours(8)),
+                LastUpdatedAt = new DateTimeOffset(2026, 5, 8, 9, 23, 0, TimeSpan.FromHours(8)),
+            },
         };
 
         StateStore.Save(doc, _path);
@@ -50,6 +69,8 @@ public sealed class StateStoreTests : IDisposable
         Assert.Equal(doc.LastResetDate, loaded.LastResetDate);
         Assert.Equal(doc.WindowPos, loaded.WindowPos);
         Assert.Equal(doc.EnableTransparency, loaded.EnableTransparency);
+        Assert.Equal(doc.PomodoroConfig, loaded.PomodoroConfig);
+        Assert.Equal(doc.PomodoroSession, loaded.PomodoroSession);
     }
 
     [Fact]
@@ -78,6 +99,25 @@ public sealed class StateStoreTests : IDisposable
     }
 
     [Fact]
+    public void Load_DefaultsLegacyPomodoroFields()
+    {
+        File.WriteAllText(_path, """
+        {
+          "schemaVersion": 1,
+          "items": [],
+          "completedToday": [],
+          "lastResetDate": "2026-05-08",
+          "enableTransparency": true
+        }
+        """);
+
+        var loaded = StateStore.Load(_path);
+
+        Assert.Equal(new PomodoroConfig(), loaded.PomodoroConfig);
+        Assert.Equal(new PomodoroSessionState(), loaded.PomodoroSession);
+    }
+
+    [Fact]
     public void Load_ReturnsDefault_WhenFileMissing()
     {
         var loaded = StateStore.Load(_path);
@@ -85,6 +125,8 @@ public sealed class StateStoreTests : IDisposable
         Assert.Empty(loaded.Items);
         Assert.Empty(loaded.CompletedToday);
         Assert.True(loaded.EnableTransparency); // Default value
+        Assert.Equal(new PomodoroConfig(), loaded.PomodoroConfig);
+        Assert.Equal(new PomodoroSessionState(), loaded.PomodoroSession);
     }
 
     [Fact]

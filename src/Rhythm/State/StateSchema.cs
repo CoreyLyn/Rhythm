@@ -23,4 +23,6 @@ public sealed class StateDocument
     public DateOnly LastResetDate { get; init; }
     public WindowPos? WindowPos { get; init; }
     public bool EnableTransparency { get; init; } = true;
+    public PomodoroConfig PomodoroConfig { get; init; } = new();
+    public PomodoroSessionState PomodoroSession { get; init; } = new();
 }
