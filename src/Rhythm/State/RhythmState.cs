@@ -17,8 +17,8 @@ public sealed class RhythmState
         LastResetDate = doc.LastResetDate;
         WindowPos = doc.WindowPos;
         EnableTransparency = doc.EnableTransparency;
-        PomodoroConfig = doc.PomodoroConfig;
-        PomodoroSession = doc.PomodoroSession;
+        PomodoroConfig = doc.PomodoroConfig ?? new PomodoroConfig();
+        PomodoroSession = doc.PomodoroSession ?? new PomodoroSessionSnapshot();
     }
 
     public IReadOnlyList<RhythmItem> Items => _items;

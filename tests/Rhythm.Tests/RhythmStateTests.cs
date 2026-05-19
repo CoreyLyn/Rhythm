@@ -328,4 +328,25 @@ public class RhythmStateTests
         Assert.Equal(updatedConfig, doc.PomodoroConfig);
         Assert.Equal(updatedSession, doc.PomodoroSession);
     }
+
+    [Fact]
+    public void Constructor_FallsBackWhenPomodoroFieldsAreNull()
+    {
+        var state = new RhythmState(new StateDocument
+        {
+            LastResetDate = new DateOnly(2026, 5, 8),
+            PomodoroConfig = null!,
+            PomodoroSession = null!,
+        });
+
+        Assert.Equal(new PomodoroConfig(), state.PomodoroConfig);
+        Assert.Equal(new PomodoroSessionSnapshot(), state.PomodoroSession);
+
+        var doc = state.ToDocument();
+
+        Assert.NotNull(doc.PomodoroConfig);
+        Assert.NotNull(doc.PomodoroSession);
+        Assert.Equal(new PomodoroConfig(), doc.PomodoroConfig);
+        Assert.Equal(new PomodoroSessionSnapshot(), doc.PomodoroSession);
+    }
 }
