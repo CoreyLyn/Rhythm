@@ -12,8 +12,8 @@ public sealed class RhythmState
     public RhythmState(StateDocument doc)
     {
         ArgumentNullException.ThrowIfNull(doc);
-        _items = doc.Items.ToList();
-        _completed = doc.CompletedToday.ToHashSet();
+        _items = doc.Items?.ToList() ?? new List<RhythmItem>();
+        _completed = doc.CompletedToday?.ToHashSet() ?? new HashSet<Guid>();
         LastResetDate = doc.LastResetDate;
         WindowPos = doc.WindowPos;
         EnableTransparency = doc.EnableTransparency;
