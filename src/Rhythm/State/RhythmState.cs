@@ -17,6 +17,8 @@ public sealed class RhythmState
         LastResetDate = doc.LastResetDate;
         WindowPos = doc.WindowPos;
         EnableTransparency = doc.EnableTransparency;
+        PomodoroConfig = doc.PomodoroConfig;
+        PomodoroSession = doc.PomodoroSession;
     }
 
     public IReadOnlyList<RhythmItem> Items => _items;
@@ -24,6 +26,8 @@ public sealed class RhythmState
     public DateOnly LastResetDate { get; private set; }
     public WindowPos? WindowPos { get; private set; }
     public bool EnableTransparency { get; private set; }
+    public PomodoroConfig PomodoroConfig { get; private set; }
+    public PomodoroSessionSnapshot PomodoroSession { get; private set; }
 
     public bool RolloverIfNeeded(DateOnly today)
     {
@@ -103,6 +107,18 @@ public sealed class RhythmState
 
     public void SetEnableTransparency(bool enabled) => EnableTransparency = enabled;
 
+    public void SetPomodoroConfig(PomodoroConfig config)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+        PomodoroConfig = config;
+    }
+
+    public void SetPomodoroSession(PomodoroSessionSnapshot session)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        PomodoroSession = session;
+    }
+
     public StateDocument ToDocument() => new()
     {
         SchemaVersion = StateDocument.CurrentSchemaVersion,
@@ -111,5 +127,7 @@ public sealed class RhythmState
         LastResetDate = LastResetDate,
         WindowPos = WindowPos,
         EnableTransparency = EnableTransparency,
+        PomodoroConfig = PomodoroConfig,
+        PomodoroSession = PomodoroSession,
     };
 }

@@ -284,4 +284,48 @@ public class RhythmStateTests
         Assert.Equal("DISPLAY1", doc.WindowPos!.ScreenDeviceName);
         Assert.False(doc.EnableTransparency);
     }
+
+    [Fact]
+    public void ToDocument_RoundtripsPomodoroState()
+    {
+        var linkedId = Guid.NewGuid();
+        var initialConfig = new PomodoroConfig(30, 6, 18, 3, false);
+        var initialSession = new PomodoroSessionSnapshot(
+            PomodoroStatus.Running,
+            PomodoroPhaseType.Focus,
+            900,
+            2,
+            5,
+            linkedId,
+            new DateTimeOffset(2026, 5, 19, 9, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 5, 19, 9, 10, 0, TimeSpan.Zero));
+        var state = new RhythmState(new StateDocument
+        {
+            LastResetDate = new DateOnly(2026, 5, 8),
+            PomodoroConfig = initialConfig,
+            PomodoroSession = initialSession,
+        });
+
+        Assert.Equal(initialConfig, state.PomodoroConfig);
+        Assert.Equal(initialSession, state.PomodoroSession);
+
+        var updatedConfig = new PomodoroConfig(25, 5, 15, 4, true);
+        var updatedSession = new PomodoroSessionSnapshot(
+            PomodoroStatus.Paused,
+            PomodoroPhaseType.ShortBreak,
+            120,
+            3,
+            6,
+            linkedId,
+            new DateTimeOffset(2026, 5, 19, 9, 30, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 5, 19, 9, 33, 0, TimeSpan.Zero));
+
+        state.SetPomodoroConfig(updatedConfig);
+        state.SetPomodoroSession(updatedSession);
+
+        var doc = state.ToDocument();
+
+        Assert.Equal(updatedConfig, doc.PomodoroConfig);
+        Assert.Equal(updatedSession, doc.PomodoroSession);
+    }
 }
