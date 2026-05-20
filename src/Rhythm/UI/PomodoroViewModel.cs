@@ -249,6 +249,7 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
     public void RefreshBindings()
     {
         OnPropertyChanged(nameof(LinkedItemText));
+        OnPropertyChanged(nameof(CompactContextText));
     }
 
     public bool SynchronizeLinkedItemAvailability()

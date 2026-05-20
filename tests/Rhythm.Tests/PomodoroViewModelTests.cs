@@ -401,6 +401,38 @@ public sealed class PomodoroViewModelTests : IDisposable
     }
 
     [Fact]
+    public void RenameItem_RefreshesCompactContextTextForLinkedRunningSession()
+    {
+        var itemId = Guid.NewGuid();
+        var context = CreateMainViewModel(
+            items:
+            [
+                new RhythmItem(itemId, "Old focus"),
+            ],
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                1200,
+                0,
+                0,
+                itemId,
+                DateTimeOffset.Now.AddMinutes(-5),
+                DateTimeOffset.Now.AddMinutes(-5)));
+        var viewModel = context.ViewModel;
+        var pomodoro = viewModel.Pomodoro;
+        var itemViewModel = viewModel.Items.Single(item => item.Id == itemId);
+        var changedProperties = new List<string?>();
+        pomodoro.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
+
+        Assert.Equal("Old focus", pomodoro.CompactContextText);
+
+        viewModel.RenameItem(itemViewModel, "New focus");
+
+        Assert.Equal("New focus", pomodoro.CompactContextText);
+        Assert.Contains(nameof(PomodoroViewModel.CompactContextText), changedProperties);
+    }
+
+    [Fact]
     public void ShouldNotifyPomodoroPhaseChange_DoesNotNotifyWhenManuallyStartingFromIdle()
     {
         var shouldNotify = InvokeShouldNotifyPomodoroPhaseChange(
