@@ -103,6 +103,36 @@ public sealed class PomodoroViewModelTests : IDisposable
     }
 
     [Fact]
+    public void PrepareForItemRemoval_ClearsLinksBeforeItemIsRemoved()
+    {
+        var linkedItemId = Guid.NewGuid();
+        var otherItemId = Guid.NewGuid();
+        var context = CreateMainViewModel(
+            items:
+            [
+                new RhythmItem(linkedItemId, "Current focus"),
+                new RhythmItem(otherItemId, "Other"),
+            ],
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                900,
+                0,
+                0,
+                linkedItemId,
+                DateTimeOffset.Now.AddMinutes(-10),
+                DateTimeOffset.Now.AddMinutes(-10)));
+        var viewModel = context.ViewModel;
+
+        viewModel.Pomodoro.PrepareForItemRemoval(linkedItemId);
+
+        Assert.Null(context.State.PomodoroSession.LinkedItemId);
+        Assert.Null(viewModel.Pomodoro.SelectedLinkedItemId);
+        Assert.Contains(context.State.Items, item => item.Id == linkedItemId);
+        Assert.Contains(viewModel.Items, item => item.Id == linkedItemId);
+    }
+
+    [Fact]
     public void RolloverAndRefresh_ClearsLinkedItemIdWhenCompletedOneTimeItemIsRemoved()
     {
         var linkedItemId = Guid.NewGuid();

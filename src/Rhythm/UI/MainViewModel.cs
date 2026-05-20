@@ -81,10 +81,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public void RemoveItem(ItemViewModel itemVm)
     {
+        Pomodoro.PrepareForItemRemoval(itemVm.Id);
         _service.State.RemoveItem(itemVm.Id);
         itemVm.PropertyChanged -= OnItemPropertyChanged;
         Items.Remove(itemVm);
-        Pomodoro.SynchronizeLinkedItemAvailability();
         _service.Persist();
     }
 

@@ -198,6 +198,32 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
         return sessionChanged || selectedChanged;
     }
 
+    public bool PrepareForItemRemoval(Guid itemId)
+    {
+        var sessionChanged = false;
+
+        if (_machine.Session.LinkedItemId == itemId)
+        {
+            _machine = new PomodoroStateMachine(
+                _machine.Config,
+                _machine.Session with
+                {
+                    LinkedItemId = null,
+                });
+            _service.State.SetPomodoroSession(_machine.Session);
+            sessionChanged = true;
+        }
+
+        var selectedChanged = _selectedLinkedItemId == itemId && SetSelectedLinkedItemId(null);
+
+        if (sessionChanged)
+            OnPropertyChanged(string.Empty);
+        else if (selectedChanged)
+            OnPropertyChanged(nameof(LinkedItemText));
+
+        return sessionChanged || selectedChanged;
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private static PomodoroConfig NormalizeConfig(PomodoroConfig config)
