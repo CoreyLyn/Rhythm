@@ -13,6 +13,7 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
     private readonly RhythmStateService _service;
     private readonly Func<DateTimeOffset> _nowProvider;
     private PomodoroStateMachine _machine;
+    private bool _isExpanded;
     private Guid? _selectedLinkedItemId;
 
     public PomodoroViewModel(
@@ -63,12 +64,41 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
         _ => "专注中",
     };
 
+    public string CompactPhaseLabel => Status switch
+    {
+        PomodoroStatus.Idle => "准备专注",
+        PomodoroStatus.Paused => "已暂停",
+        PomodoroStatus.Running => PhaseType switch
+        {
+            PomodoroPhaseType.Focus => "专注中",
+            PomodoroPhaseType.ShortBreak => "短休息",
+            PomodoroPhaseType.LongBreak => "长休息",
+            _ => "专注中",
+        },
+        _ => "准备专注",
+    };
+
     public string RemainingText => FormatRemaining(_machine.Session.RemainingSeconds);
 
     public string CycleText =>
         $"本轮 {Math.Min(_machine.Session.CompletedFocusCountInCycle, Math.Max(1, Config.LongBreakEvery))}/{Math.Max(1, Config.LongBreakEvery)}，今日 {_machine.Session.CompletedFocusCountToday} 个番茄";
 
     public string LinkedItemText => ResolveLinkedItemText();
+
+    public string CompactContextText => ResolveCompactContextText();
+
+    public string CompactToneKey => Status switch
+    {
+        PomodoroStatus.Idle => "Idle",
+        PomodoroStatus.Paused => "Paused",
+        _ => PhaseType switch
+        {
+            PomodoroPhaseType.Focus => "Focus",
+            PomodoroPhaseType.ShortBreak => "ShortBreak",
+            PomodoroPhaseType.LongBreak => "LongBreak",
+            _ => "Idle",
+        },
+    };
 
     public bool IsIdle => Status == PomodoroStatus.Idle;
 
@@ -83,6 +113,23 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
     public bool CanSkip => !IsIdle;
 
     public bool CanReset => !IsIdle || _machine.Session.CompletedFocusCountToday > 0;
+
+    public string PrimaryActionText => IsRunning ? "暂停" : IsPaused ? "继续" : "开始专注";
+
+    public bool CanExecutePrimaryAction => CanPause || CanStartOrResume;
+
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        set
+        {
+            if (_isExpanded == value)
+                return;
+
+            _isExpanded = value;
+            OnPropertyChanged();
+        }
+    }
 
     public Guid? SelectedLinkedItemId
     {
@@ -113,6 +160,14 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
 
         SyncSelectedLinkedItemIdFromSession();
         PersistAndNotifyIfChanged(previousSession);
+    }
+
+    public void ExecutePrimaryAction()
+    {
+        if (IsRunning)
+            Pause();
+        else
+            StartOrResume();
     }
 
     public void Pause()
@@ -251,6 +306,8 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
         return sessionChanged || selectedChanged;
     }
 
+    public void SetExpanded(bool isExpanded) => IsExpanded = isExpanded;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private static PomodoroConfig NormalizeConfig(PomodoroConfig config)
@@ -335,6 +392,29 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
         }
 
         return "关联事项：未关联事项";
+    }
+
+    private string ResolveCompactContextText()
+    {
+        if (Status == PomodoroStatus.Idle)
+            return $"可开始 {Config.FocusMinutes} 分钟";
+
+        if (_machine.Session.LinkedItemId is { } linkedItemId)
+        {
+            var linkedItem = AvailableItems.FirstOrDefault(candidate => candidate.Id == linkedItemId);
+            if (linkedItem is not null)
+                return linkedItem.Text;
+        }
+
+        if (Status == PomodoroStatus.Paused)
+            return $"剩余 {RemainingText}";
+
+        return PhaseType switch
+        {
+            PomodoroPhaseType.ShortBreak => "上一轮已完成",
+            PomodoroPhaseType.LongBreak => $"已完成 {Math.Max(1, Config.LongBreakEvery)} 轮",
+            _ => "未关联事项",
+        };
     }
 
     private Guid? ResolveValidLinkedItemId(Guid? itemId)

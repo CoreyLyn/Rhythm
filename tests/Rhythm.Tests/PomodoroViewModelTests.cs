@@ -221,6 +221,103 @@ public sealed class PomodoroViewModelTests : IDisposable
     }
 
     [Fact]
+    public void CompactStripTexts_ShowIdleSummaryWhenSessionIsIdle()
+    {
+        var context = CreateMainViewModel(
+            pomodoroConfig: new PomodoroConfig(FocusMinutes: 30, ShortBreakMinutes: 5, LongBreakMinutes: 15, LongBreakEvery: 4, AutoStartNextPhase: true));
+        var pomodoro = context.ViewModel.Pomodoro;
+
+        Assert.Equal("准备专注", pomodoro.CompactPhaseLabel);
+        Assert.Equal("可开始 30 分钟", pomodoro.CompactContextText);
+        Assert.Equal("开始专注", pomodoro.PrimaryActionText);
+        Assert.Equal("Idle", pomodoro.CompactToneKey);
+        Assert.False(pomodoro.IsExpanded);
+    }
+
+    [Fact]
+    public void CompactStripTexts_ShowLinkedItemDuringRunningFocus()
+    {
+        var itemId = Guid.NewGuid();
+        var context = CreateMainViewModel(
+            items:
+            [
+                new RhythmItem(itemId, "AI Architect"),
+            ],
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                1452,
+                0,
+                0,
+                itemId,
+                DateTimeOffset.Now.AddMinutes(-1),
+                DateTimeOffset.Now.AddMinutes(-1)));
+        var pomodoro = context.ViewModel.Pomodoro;
+
+        Assert.Equal("专注中", pomodoro.CompactPhaseLabel);
+        Assert.Equal("AI Architect", pomodoro.CompactContextText);
+        Assert.Equal("暂停", pomodoro.PrimaryActionText);
+        Assert.Equal("Focus", pomodoro.CompactToneKey);
+    }
+
+    [Fact]
+    public void CompactStripTexts_ShowRemainingSummaryWhenPausedWithoutLinkedItem()
+    {
+        var context = CreateMainViewModel(
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Paused,
+                PomodoroPhaseType.Focus,
+                751,
+                1,
+                2,
+                null,
+                DateTimeOffset.Now.AddMinutes(-10),
+                DateTimeOffset.Now.AddMinutes(-4)));
+        var pomodoro = context.ViewModel.Pomodoro;
+
+        Assert.Equal("已暂停", pomodoro.CompactPhaseLabel);
+        Assert.Equal("剩余 12:31", pomodoro.CompactContextText);
+        Assert.Equal("继续", pomodoro.PrimaryActionText);
+        Assert.Equal("Paused", pomodoro.CompactToneKey);
+    }
+
+    [Fact]
+    public void SetExpanded_TogglesUiStateWithoutChangingPomodoroSession()
+    {
+        var context = CreateMainViewModel();
+        var pomodoro = context.ViewModel.Pomodoro;
+        var originalSession = context.State.PomodoroSession;
+
+        pomodoro.SetExpanded(true);
+        Assert.True(pomodoro.IsExpanded);
+
+        pomodoro.SetExpanded(false);
+        Assert.False(pomodoro.IsExpanded);
+        Assert.Equal(originalSession, context.State.PomodoroSession);
+    }
+
+    [Fact]
+    public void ExecutePrimaryAction_PausesWhenRunningAndStartsWhenIdle()
+    {
+        var runningContext = CreateMainViewModel(
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                900,
+                0,
+                0,
+                null,
+                DateTimeOffset.Now.AddMinutes(-10),
+                DateTimeOffset.Now.AddMinutes(-10)));
+        runningContext.ViewModel.Pomodoro.ExecutePrimaryAction();
+        Assert.Equal(PomodoroStatus.Paused, runningContext.ViewModel.Pomodoro.Status);
+
+        var idleContext = CreateMainViewModel();
+        idleContext.ViewModel.Pomodoro.ExecutePrimaryAction();
+        Assert.Equal(PomodoroStatus.Running, idleContext.ViewModel.Pomodoro.Status);
+    }
+
+    [Fact]
     public void ShouldNotifyPomodoroPhaseChange_DoesNotNotifyWhenManuallyStartingFromIdle()
     {
         var shouldNotify = InvokeShouldNotifyPomodoroPhaseChange(
