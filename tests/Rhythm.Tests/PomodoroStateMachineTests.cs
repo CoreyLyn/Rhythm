@@ -121,6 +121,140 @@ public sealed class PomodoroStateMachineTests
     }
 
     [Fact]
+    public void AdvanceTo_FocusCompletionStartsShortBreakAndIncrementsCounts()
+    {
+        var linkedItemId = Guid.NewGuid();
+        var machine = new PomodoroStateMachine(
+            new PomodoroConfig(FocusMinutes: 25, ShortBreakMinutes: 5),
+            new PomodoroSessionSnapshot());
+
+        machine.Start(StartTime, linkedItemId);
+
+        var session = machine.AdvanceTo(StartTime.AddMinutes(25));
+
+        Assert.Equal(
+            new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.ShortBreak,
+                300,
+                1,
+                1,
+                null,
+                StartTime.AddMinutes(25),
+                StartTime.AddMinutes(25)),
+            session);
+        Assert.Equal(session, machine.Session);
+    }
+
+    [Fact]
+    public void AdvanceTo_FourthFocusCompletionStartsLongBreak()
+    {
+        var machine = new PomodoroStateMachine(
+            new PomodoroConfig(FocusMinutes: 25, ShortBreakMinutes: 5, LongBreakMinutes: 15, LongBreakEvery: 4),
+            new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                1500,
+                3,
+                7,
+                Guid.NewGuid(),
+                StartTime,
+                StartTime));
+
+        var session = machine.AdvanceTo(StartTime.AddMinutes(25));
+
+        Assert.Equal(
+            new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.LongBreak,
+                900,
+                0,
+                8,
+                null,
+                StartTime.AddMinutes(25),
+                StartTime.AddMinutes(25)),
+            session);
+        Assert.Equal(session, machine.Session);
+    }
+
+    [Fact]
+    public void SkipCurrentPhase_DoesNotCountSkippedFocusAsCompleted()
+    {
+        var linkedItemId = Guid.NewGuid();
+        var machine = new PomodoroStateMachine(
+            new PomodoroConfig(FocusMinutes: 25, ShortBreakMinutes: 5),
+            new PomodoroSessionSnapshot());
+
+        machine.Start(StartTime, linkedItemId);
+        machine.AdvanceTo(StartTime.AddMinutes(10));
+
+        var session = machine.SkipCurrentPhase(StartTime.AddMinutes(10));
+
+        Assert.Equal(
+            new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.ShortBreak,
+                300,
+                0,
+                0,
+                null,
+                StartTime.AddMinutes(10),
+                StartTime.AddMinutes(10)),
+            session);
+        Assert.Equal(session, machine.Session);
+    }
+
+    [Fact]
+    public void AdvanceTo_AutoStartDisabledStopsAtNextPhasePaused()
+    {
+        var machine = new PomodoroStateMachine(
+            new PomodoroConfig(FocusMinutes: 25, ShortBreakMinutes: 5, AutoStartNextPhase: false),
+            new PomodoroSessionSnapshot());
+
+        machine.Start(StartTime, Guid.NewGuid());
+
+        var session = machine.AdvanceTo(StartTime.AddMinutes(25));
+
+        Assert.Equal(
+            new PomodoroSessionSnapshot(
+                PomodoroStatus.Paused,
+                PomodoroPhaseType.ShortBreak,
+                300,
+                1,
+                1,
+                null,
+                StartTime.AddMinutes(25),
+                StartTime.AddMinutes(25)),
+            session);
+        Assert.Equal(session, machine.Session);
+    }
+
+    [Fact]
+    public void AdvanceTo_RestoresAcrossMultiplePhasesUsingElapsedTime()
+    {
+        var machine = new PomodoroStateMachine(
+            new PomodoroConfig(FocusMinutes: 25, ShortBreakMinutes: 5),
+            new PomodoroSessionSnapshot());
+
+        machine.Start(StartTime, Guid.NewGuid());
+
+        var session = machine.AdvanceTo(StartTime.AddMinutes(61));
+
+        Assert.Equal(
+            new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                1440,
+                2,
+                2,
+                null,
+                StartTime.AddMinutes(60),
+                StartTime.AddMinutes(61)),
+            session);
+        Assert.Equal(session, machine.Session);
+    }
+
+    [Fact]
     public void Reset_ReturnsToIdleFocusAndClearsLinkedItem()
     {
         var machine = new PomodoroStateMachine(

@@ -37,7 +37,7 @@ public sealed class PomodoroStateMachine
         if (Session.Status != PomodoroStatus.Running)
             return Session;
 
-        Session = AdvanceRunningSession(now) with
+        Session = AdvanceRunningSession(Session, now) with
         {
             Status = PomodoroStatus.Paused,
             LastUpdatedAt = now,
@@ -82,33 +82,73 @@ public sealed class PomodoroStateMachine
         if (Session.Status != PomodoroStatus.Running)
             return Session;
 
-        Session = AdvanceRunningSession(now);
+        Session = AdvanceRunningSession(Session, now);
         return Session;
     }
 
-    private PomodoroSessionSnapshot AdvanceRunningSession(DateTimeOffset now)
+    public PomodoroSessionSnapshot SkipCurrentPhase(DateTimeOffset now)
     {
-        if (Session.PhaseStartedAt is null)
+        if (Session.Status == PomodoroStatus.Idle)
+            return Session;
+
+        var session = Session;
+
+        if (session.Status == PomodoroStatus.Running)
+            session = AdvanceRunningSession(session, now);
+
+        var shouldRunNextPhase = session.Status == PomodoroStatus.Running && Config.AutoStartNextPhase;
+        Session = CreateNextPhaseSession(session, now, completedFocus: false, shouldRunNextPhase);
+        return Session;
+    }
+
+    private PomodoroSessionSnapshot AdvanceRunningSession(
+        PomodoroSessionSnapshot session,
+        DateTimeOffset now)
+    {
+        if (session.PhaseStartedAt is null)
         {
-            return Session with
+            return session with
             {
                 LastUpdatedAt = now,
             };
         }
 
-        var baseline = Session.LastUpdatedAt ?? Session.PhaseStartedAt.Value;
+        var baseline = session.LastUpdatedAt ?? session.PhaseStartedAt.Value;
         var elapsedSeconds = (int)Math.Max(0, (now - baseline).TotalSeconds);
 
-        if (elapsedSeconds <= 0)
-            return Session;
+        if (elapsedSeconds <= 0 && session.RemainingSeconds > 0)
+            return session;
 
-        var remainingSeconds = Math.Max(0, Session.RemainingSeconds - elapsedSeconds);
+        var current = session;
+        var remainingElapsedSeconds = elapsedSeconds;
 
-        return Session with
+        while (true)
         {
-            RemainingSeconds = remainingSeconds,
-            LastUpdatedAt = now,
-        };
+            var secondsToPhaseEnd = Math.Max(0, current.RemainingSeconds);
+
+            if (secondsToPhaseEnd > remainingElapsedSeconds)
+            {
+                return current with
+                {
+                    RemainingSeconds = secondsToPhaseEnd - remainingElapsedSeconds,
+                    LastUpdatedAt = now,
+                };
+            }
+
+            remainingElapsedSeconds -= secondsToPhaseEnd;
+            var transitionTime = baseline.AddSeconds(secondsToPhaseEnd);
+
+            current = CreateNextPhaseSession(
+                current,
+                transitionTime,
+                completedFocus: current.PhaseType == PomodoroPhaseType.Focus,
+                shouldRunNextPhase: Config.AutoStartNextPhase);
+
+            if (current.Status != PomodoroStatus.Running || remainingElapsedSeconds <= 0)
+                return current;
+
+            baseline = transitionTime;
+        }
     }
 
     private int GetPhaseDurationSeconds(PomodoroPhaseType phaseType) => phaseType switch
@@ -118,4 +158,52 @@ public sealed class PomodoroStateMachine
         PomodoroPhaseType.LongBreak => Config.LongBreakMinutes * 60,
         _ => throw new ArgumentOutOfRangeException(nameof(phaseType), phaseType, null),
     };
+
+    private PomodoroSessionSnapshot CreateNextPhaseSession(
+        PomodoroSessionSnapshot session,
+        DateTimeOffset transitionTime,
+        bool completedFocus,
+        bool shouldRunNextPhase)
+    {
+        var nextPhaseType = GetNextPhaseType(session, completedFocus, out var completedFocusCountInCycle, out var completedFocusCountToday);
+
+        return session with
+        {
+            Status = shouldRunNextPhase ? PomodoroStatus.Running : PomodoroStatus.Paused,
+            PhaseType = nextPhaseType,
+            RemainingSeconds = GetPhaseDurationSeconds(nextPhaseType),
+            CompletedFocusCountInCycle = completedFocusCountInCycle,
+            CompletedFocusCountToday = completedFocusCountToday,
+            LinkedItemId = null,
+            PhaseStartedAt = transitionTime,
+            LastUpdatedAt = transitionTime,
+        };
+    }
+
+    private PomodoroPhaseType GetNextPhaseType(
+        PomodoroSessionSnapshot session,
+        bool completedFocus,
+        out int completedFocusCountInCycle,
+        out int completedFocusCountToday)
+    {
+        completedFocusCountInCycle = session.CompletedFocusCountInCycle;
+        completedFocusCountToday = session.CompletedFocusCountToday;
+
+        if (session.PhaseType != PomodoroPhaseType.Focus)
+            return PomodoroPhaseType.Focus;
+
+        if (!completedFocus)
+            return PomodoroPhaseType.ShortBreak;
+
+        completedFocusCountToday++;
+        completedFocusCountInCycle++;
+
+        if (completedFocusCountInCycle >= Math.Max(1, Config.LongBreakEvery))
+        {
+            completedFocusCountInCycle = 0;
+            return PomodoroPhaseType.LongBreak;
+        }
+
+        return PomodoroPhaseType.ShortBreak;
+    }
 }
