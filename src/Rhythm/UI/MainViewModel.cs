@@ -13,6 +13,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private readonly RhythmStateService _service;
 
     public ObservableCollection<ItemViewModel> Items { get; }
+    public PomodoroViewModel Pomodoro { get; }
 
     public bool HasItems => Items.Count > 0;
 
@@ -34,12 +35,14 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _service = service;
         Items = new ObservableCollection<ItemViewModel>(
             _service.State.Items.Select(i => new ItemViewModel(_service, i)));
+        Pomodoro = new PomodoroViewModel(_service, Items);
         Items.CollectionChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(HasItems));
             OnPropertyChanged(nameof(CompletedCount));
             OnPropertyChanged(nameof(TotalCount));
             OnPropertyChanged(nameof(ProgressText));
+            Pomodoro.RefreshBindings();
         };
 
         // Subscribe to item completion changes
@@ -79,8 +82,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public void RemoveItem(ItemViewModel itemVm)
     {
         _service.State.RemoveItem(itemVm.Id);
+        itemVm.PropertyChanged -= OnItemPropertyChanged;
         Items.Remove(itemVm);
         _service.Persist();
+        Pomodoro.RefreshBindings();
     }
 
     public void RenameItem(ItemViewModel itemVm, string newText)
@@ -89,6 +94,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         var renamed = _service.State.Items.Single(i => i.Id == itemVm.Id);
         itemVm.UpdateText(renamed.Text);
         _service.Persist();
+        Pomodoro.RefreshBindings();
     }
 
     public void MoveItemTo(ItemViewModel itemVm, int newIndex)
@@ -129,6 +135,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
 
         OnPropertyChanged(nameof(CurrentDate));
+        Pomodoro.RefreshBindings();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
