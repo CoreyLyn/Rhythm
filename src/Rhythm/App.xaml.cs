@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -14,11 +15,21 @@ namespace Rhythm;
 
 public partial class App : Application
 {
+    private static readonly FieldInfo? PomodoroMachineField = typeof(PomodoroViewModel).GetField("_machine", BindingFlags.Instance | BindingFlags.NonPublic);
+
     private TaskbarIcon? _trayIcon;
+    private ContextMenu? _trayMenu;
+    private MenuItem? _pomodoroActionMenuItem;
+    private MenuItem? _pomodoroSkipMenuItem;
+    private MenuItem? _pomodoroResetMenuItem;
     private MainViewModel? _viewModel;
     private MainWindow? _mainWindow;
     private DispatcherTimer? _midnightTimer;
+    private DispatcherTimer? _pomodoroTimer;
     private bool _isRecreatingWindow;
+    private PomodoroPhaseType? _lastPomodoroPhase;
+    private PomodoroStatus? _lastPomodoroStatus;
+    private int? _lastCompletedFocusCountToday;
 
     public bool IsShuttingDown { get; private set; }
 
@@ -50,6 +61,7 @@ public partial class App : Application
         _mainWindow.Show();
 
         BuildTrayIcon();
+        InitializePomodoroTimer();
         ScheduleNextMidnight();
     }
 
@@ -63,6 +75,7 @@ public partial class App : Application
         };
 
         var menu = new ContextMenu();
+        _trayMenu = menu;
         var enableTransparency = _viewModel?.EnableTransparency ?? true;
         UpdateMenuBackground(menu, enableTransparency);
         var miShow = new MenuItem { Header = "显示窗口" };
@@ -71,9 +84,21 @@ public partial class App : Application
         miHide.Click += (_, _) => HideMainWindow();
         var miEdit = new MenuItem { Header = "编辑事项..." };
         miEdit.Click += (_, _) => OpenEditItems();
+        _pomodoroActionMenuItem = new MenuItem();
+        _pomodoroSkipMenuItem = new MenuItem { Header = "跳过当前阶段" };
+        _pomodoroResetMenuItem = new MenuItem { Header = "重置番茄钟" };
+        var miPomodoroSettings = new MenuItem { Header = "番茄钟设置..." };
         var miAutostart = new MenuItem { IsCheckable = true, StaysOpenOnClick = true };
         RefreshAutostartMenuItem(miAutostart);
-        menu.Opened += (_, _) => RefreshAutostartMenuItem(miAutostart);
+        menu.Opened += (_, _) =>
+        {
+            RefreshPomodoroMenuItems();
+            RefreshAutostartMenuItem(miAutostart);
+        };
+        _pomodoroActionMenuItem.Click += (_, _) => ExecutePomodoroPrimaryAction();
+        _pomodoroSkipMenuItem.Click += (_, _) => SkipPomodoroPhase();
+        _pomodoroResetMenuItem.Click += (_, _) => ResetPomodoro();
+        miPomodoroSettings.Click += (_, _) => OpenPomodoroSettings();
         miAutostart.Click += (_, _) =>
         {
             try
@@ -116,6 +141,11 @@ public partial class App : Application
         menu.Items.Add(miHide);
         menu.Items.Add(miEdit);
         menu.Items.Add(new Separator());
+        menu.Items.Add(_pomodoroActionMenuItem);
+        menu.Items.Add(_pomodoroSkipMenuItem);
+        menu.Items.Add(_pomodoroResetMenuItem);
+        menu.Items.Add(miPomodoroSettings);
+        menu.Items.Add(new Separator());
         menu.Items.Add(miAutostart);
         menu.Items.Add(miTransparency);
         menu.Items.Add(new Separator());
@@ -125,6 +155,47 @@ public partial class App : Application
         _trayIcon.ContextMenu = menu;
         _trayIcon.TrayLeftMouseDoubleClick += (_, _) => ShowMainWindow();
         _trayIcon.ForceCreate();
+    }
+
+    private void RefreshPomodoroMenuItems()
+    {
+        if (_pomodoroActionMenuItem == null || _pomodoroSkipMenuItem == null || _pomodoroResetMenuItem == null)
+            return;
+
+        if (_viewModel == null)
+        {
+            _pomodoroActionMenuItem.Header = "开始专注";
+            _pomodoroActionMenuItem.IsEnabled = false;
+            _pomodoroSkipMenuItem.IsEnabled = false;
+            _pomodoroResetMenuItem.IsEnabled = false;
+            return;
+        }
+
+        var pomodoro = _viewModel.Pomodoro;
+        if (pomodoro.IsRunning)
+        {
+            _pomodoroActionMenuItem.Header = "暂停番茄钟";
+            _pomodoroActionMenuItem.IsEnabled = pomodoro.CanPause;
+        }
+        else if (pomodoro.IsPaused)
+        {
+            _pomodoroActionMenuItem.Header = "继续番茄钟";
+            _pomodoroActionMenuItem.IsEnabled = pomodoro.CanStartOrResume;
+        }
+        else
+        {
+            _pomodoroActionMenuItem.Header = "开始专注";
+            _pomodoroActionMenuItem.IsEnabled = pomodoro.CanStartOrResume;
+        }
+
+        _pomodoroSkipMenuItem.IsEnabled = pomodoro.CanSkip;
+        _pomodoroResetMenuItem.IsEnabled = pomodoro.CanReset;
+    }
+
+    private void RefreshPomodoroMenuItemsIfOpen()
+    {
+        if (_trayMenu?.IsOpen == true)
+            RefreshPomodoroMenuItems();
     }
 
     private static void RefreshAutostartMenuItem(MenuItem menuItem)
@@ -160,6 +231,7 @@ public partial class App : Application
         if (_mainWindow == null || _viewModel == null) return;
 
         // Save current window position and size
+        var wasVisible = _mainWindow.IsVisible;
         var oldLeft = _mainWindow.Left;
         var oldTop = _mainWindow.Top;
         var oldWidth = _mainWindow.Width;
@@ -186,7 +258,8 @@ public partial class App : Application
             if (Math.Abs(_mainWindow.ActualHeight - oldHeight) > 1 && oldHeight > 0)
                 _mainWindow.Height = oldHeight;
         };
-        _mainWindow.Show();
+        if (wasVisible)
+            _mainWindow.Show();
 
         // Update tray menu background
         if (_trayIcon?.ContextMenu != null)
@@ -251,12 +324,154 @@ public partial class App : Application
         w.ShowDialog();
     }
 
+    public void OpenPomodoroSettings()
+    {
+        if (_viewModel == null) return;
+
+        var enableTransparency = _viewModel.EnableTransparency;
+        var window = new PomodoroSettingsWindow(_viewModel.Pomodoro.Config, enableTransparency);
+        if (_mainWindow?.IsVisible == true)
+        {
+            window.Owner = _mainWindow;
+        }
+        else
+        {
+            window.ShowInTaskbar = true;
+            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        }
+
+        if (window.ShowDialog() == true)
+        {
+            _viewModel.Pomodoro.ApplyConfig(window.ResultConfig);
+            SyncPomodoroState(showNotification: false);
+        }
+    }
+
     private void ShutdownApp()
     {
         IsShuttingDown = true;
         _midnightTimer?.Stop();
+        StopPomodoroTimer();
         _trayIcon?.Dispose();
         Shutdown();
+    }
+
+    private void InitializePomodoroTimer()
+    {
+        StopPomodoroTimer();
+        SyncPomodoroState(showNotification: false);
+
+        _pomodoroTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1),
+        };
+        _pomodoroTimer.Tick += (_, _) =>
+        {
+            _viewModel?.Pomodoro.AdvanceToNow();
+            SyncPomodoroState(showNotification: true);
+        };
+        _pomodoroTimer.Start();
+    }
+
+    private void StopPomodoroTimer()
+    {
+        _pomodoroTimer?.Stop();
+        _pomodoroTimer = null;
+    }
+
+    private void ExecutePomodoroPrimaryAction()
+    {
+        if (_viewModel == null) return;
+
+        var pomodoro = _viewModel.Pomodoro;
+        if (pomodoro.IsRunning)
+            pomodoro.Pause();
+        else
+            pomodoro.StartOrResume();
+
+        SyncPomodoroState(showNotification: true);
+    }
+
+    private void SkipPomodoroPhase()
+    {
+        if (_viewModel == null || !_viewModel.Pomodoro.CanSkip) return;
+
+        _viewModel.Pomodoro.SkipCurrentPhase();
+        SyncPomodoroState(showNotification: true);
+    }
+
+    private void ResetPomodoro()
+    {
+        if (_viewModel == null || !_viewModel.Pomodoro.CanReset) return;
+
+        _viewModel.Pomodoro.Reset();
+        SyncPomodoroState(showNotification: false);
+    }
+
+    private void SyncPomodoroState(bool showNotification)
+    {
+        if (_viewModel == null) return;
+
+        var pomodoro = _viewModel.Pomodoro;
+        var phase = pomodoro.PhaseType;
+        var status = pomodoro.Status;
+        var completedFocusCountToday = GetCompletedFocusCountToday();
+        var shouldNotify = showNotification && ShouldNotifyPomodoroPhaseChange(phase, status, completedFocusCountToday);
+
+        _lastPomodoroPhase = phase;
+        _lastPomodoroStatus = status;
+        _lastCompletedFocusCountToday = completedFocusCountToday;
+
+        RefreshPomodoroMenuItemsIfOpen();
+
+        if (shouldNotify)
+            ShowPomodoroNotification(phase);
+    }
+
+    private bool ShouldNotifyPomodoroPhaseChange(PomodoroPhaseType phase, PomodoroStatus status, int? completedFocusCountToday)
+    {
+        if (status == PomodoroStatus.Idle || _lastPomodoroPhase is null || _lastPomodoroStatus is null)
+            return false;
+
+        if (_lastPomodoroPhase != phase || _lastPomodoroStatus == PomodoroStatus.Idle)
+            return true;
+
+        return completedFocusCountToday is { } currentCount
+            && _lastCompletedFocusCountToday is { } previousCount
+            && currentCount > previousCount;
+    }
+
+    private int? GetCompletedFocusCountToday()
+    {
+        if (_viewModel?.Pomodoro == null || PomodoroMachineField?.GetValue(_viewModel.Pomodoro) is not PomodoroStateMachine machine)
+            return null;
+
+        return machine.Session.CompletedFocusCountToday;
+    }
+
+    private void ShowPomodoroNotification(PomodoroPhaseType phase)
+    {
+        if (_trayIcon == null)
+            return;
+
+        var message = phase switch
+        {
+            PomodoroPhaseType.Focus => "进入专注阶段。",
+            PomodoroPhaseType.ShortBreak => "进入短休息阶段。",
+            PomodoroPhaseType.LongBreak => "进入长休息阶段。",
+            _ => "番茄钟阶段已切换。",
+        };
+
+        _trayIcon.ShowNotification(
+            "Rhythm 番茄钟",
+            message,
+            default,
+            null,
+            false,
+            false,
+            true,
+            true,
+            TimeSpan.FromSeconds(3));
     }
 
     private void ScheduleNextMidnight()
@@ -280,6 +495,7 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _midnightTimer?.Stop();
+        StopPomodoroTimer();
         _trayIcon?.Dispose();
         base.OnExit(e);
     }
