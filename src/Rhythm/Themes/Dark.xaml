@@ -11,6 +11,16 @@
     <SolidColorBrush x:Key="MutedForegroundBrush" Color="#8E8E93" />
     <SolidColorBrush x:Key="AccentBrush" Color="#0A84FF" />
     <SolidColorBrush x:Key="DividerBrush" Color="#3A3A3C" />
+    <SolidColorBrush x:Key="PomodoroCardBrush" Color="#243341" />
+    <SolidColorBrush x:Key="PomodoroCardBorderBrush" Color="#395166" />
+    <SolidColorBrush x:Key="PomodoroMutedBrush" Color="#9EB4C7" />
+    <SolidColorBrush x:Key="PomodoroInputBackgroundBrush" Color="#192129" />
+    <SolidColorBrush x:Key="PomodoroButtonBrush" Color="#0A84FF" />
+    <SolidColorBrush x:Key="PomodoroButtonHoverBrush" Color="#369BFF" />
+    <SolidColorBrush x:Key="PomodoroButtonPressedBrush" Color="#006DD9" />
+    <SolidColorBrush x:Key="PomodoroSecondaryButtonBrush" Color="#2D3945" />
+    <SolidColorBrush x:Key="PomodoroSecondaryButtonHoverBrush" Color="#384654" />
+    <SolidColorBrush x:Key="PomodoroSecondaryButtonPressedBrush" Color="#25313D" />
 
     <!--  Header Styles  -->
     <Style x:Key="HeaderDateStyle" TargetType="TextBlock">
@@ -27,6 +37,253 @@
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
         <Setter Property="Margin" Value="0,6,0,0" />
+    </Style>
+
+    <Style x:Key="PomodoroCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource PomodoroCardBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource PomodoroCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="14" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+
+    <Style x:Key="PomodoroPhaseBadgeStyle" TargetType="Border">
+        <Setter Property="Background" Value="#243E56" />
+        <Setter Property="CornerRadius" Value="999" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="PomodoroPhaseTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
+    </Style>
+
+    <Style x:Key="PomodoroTimerStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+        <Setter Property="FontSize" Value="34" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontFamily" Value="Consolas, Microsoft YaHei UI, Segoe UI" />
+        <Setter Property="Margin" Value="0,12,0,0" />
+    </Style>
+
+    <Style x:Key="PomodoroMetaStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource PomodoroMutedBrush}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
+        <Setter Property="Margin" Value="0,4,0,0" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="PomodoroButtonBaseStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
+        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="ButtonBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="7">
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.96" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.86" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource MutedForegroundBrush}" />
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.48" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PomodoroPrimaryButtonStyle" BasedOn="{StaticResource PomodoroButtonBaseStyle}" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource PomodoroButtonBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource PomodoroButtonBrush}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource PomodoroButtonHoverBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource PomodoroButtonHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource PomodoroButtonPressedBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource PomodoroButtonPressedBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PomodoroSecondaryButtonStyle" BasedOn="{StaticResource PomodoroButtonBaseStyle}" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource PomodoroSecondaryButtonBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource PomodoroCardBorderBrush}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource PomodoroSecondaryButtonHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource PomodoroSecondaryButtonPressedBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PomodoroComboBoxItemStyle" TargetType="ComboBoxItem">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border
+                        x:Name="ItemBorder"
+                        Margin="4"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6">
+                        <ContentPresenter
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource DividerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource PomodoroSecondaryButtonBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource MutedForegroundBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PomodoroComboBoxStyle" TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+        <Setter Property="Background" Value="{StaticResource PomodoroInputBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource PomodoroCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Height" Value="38" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource PomodoroComboBoxItemStyle}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <ToggleButton
+                            x:Name="DropDownToggle"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            ClickMode="Press"
+                            Focusable="False"
+                            IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border
+                                        x:Name="ComboBorder"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="7">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <ContentPresenter
+                                                Grid.Column="0"
+                                                Margin="12,0,12,0"
+                                                VerticalAlignment="Center"
+                                                Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                ContentTemplate="{Binding SelectionBoxItemTemplate, RelativeSource={RelativeSource AncestorType=ComboBox}}" />
+
+                                            <TextBlock
+                                                x:Name="PlaceholderText"
+                                                Grid.Column="0"
+                                                Margin="12,0,12,0"
+                                                VerticalAlignment="Center"
+                                                Foreground="{StaticResource MutedForegroundBrush}"
+                                                Text="不关联事项"
+                                                Visibility="Collapsed" />
+
+                                            <Path
+                                                Grid.Column="1"
+                                                Margin="0,0,12,0"
+                                                VerticalAlignment="Center"
+                                                Data="M 0 0 L 4 4 L 8 0"
+                                                Stroke="{StaticResource PomodoroMutedBrush}"
+                                                StrokeLineJoin="Round"
+                                                StrokeStartLineCap="Round"
+                                                StrokeEndLineCap="Round"
+                                                StrokeThickness="1.6" />
+                                        </Grid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="ComboBorder" Property="Background" Value="#1E2832" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="ComboBorder" Property="Background" Value="#182028" />
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{StaticResource MutedForegroundBrush}" />
+                                            <Setter TargetName="ComboBorder" Property="Opacity" Value="0.58" />
+                                        </Trigger>
+                                        <DataTrigger Binding="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ComboBox}}" Value="{x:Null}">
+                                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+
+                        <Popup
+                            AllowsTransparency="True"
+                            Focusable="False"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            Placement="Bottom"
+                            PopupAnimation="Slide">
+                            <Border
+                                x:Name="DropDownBorder"
+                                MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                Margin="0,6,0,0"
+                                Background="{StaticResource CardBackgroundBrush}"
+                                BorderBrush="{StaticResource PomodoroCardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                                <ScrollViewer MaxHeight="220">
+                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!--  Card Container Style  -->

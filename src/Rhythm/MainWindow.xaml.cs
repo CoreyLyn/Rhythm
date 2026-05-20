@@ -164,6 +164,36 @@ public partial class MainWindow : Window
             app.ShutdownFromUi();
     }
 
+    private void OnPomodoroStartOrResumeClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel { Pomodoro.CanStartOrResume: true } vm)
+            vm.Pomodoro.StartOrResume();
+    }
+
+    private void OnPomodoroPauseClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel { Pomodoro.CanPause: true } vm)
+            vm.Pomodoro.Pause();
+    }
+
+    private void OnPomodoroSkipClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel { Pomodoro.CanSkip: true } vm)
+            vm.Pomodoro.SkipCurrentPhase();
+    }
+
+    private void OnPomodoroResetClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel { Pomodoro.CanReset: true } vm)
+            vm.Pomodoro.Reset();
+    }
+
+    private void OnPomodoroSettingsClick(object sender, RoutedEventArgs e)
+    {
+        if (Application.Current is App app)
+            app.OpenPomodoroSettings();
+    }
+
     private void OnWindowKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)

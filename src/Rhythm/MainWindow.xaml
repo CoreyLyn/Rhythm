@@ -37,6 +37,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -46,9 +47,86 @@
                 <TextBlock Style="{StaticResource HeaderStatsStyle}" Text="{Binding ProgressText}" />
             </StackPanel>
 
+            <!--  Pomodoro Section  -->
+            <Border Grid.Row="1" Style="{StaticResource PomodoroCardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource PomodoroPhaseBadgeStyle}">
+                            <TextBlock Style="{StaticResource PomodoroPhaseTextStyle}" Text="{Binding Pomodoro.PhaseLabel}" />
+                        </Border>
+
+                        <Button
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            Click="OnPomodoroSettingsClick"
+                            Content="设置"
+                            Style="{StaticResource PomodoroSecondaryButtonStyle}" />
+                    </Grid>
+
+                    <TextBlock
+                        Grid.Row="1"
+                        Style="{StaticResource PomodoroTimerStyle}"
+                        Text="{Binding Pomodoro.RemainingText}" />
+
+                    <StackPanel Grid.Row="2" Margin="0,8,0,0">
+                        <TextBlock Style="{StaticResource PomodoroMetaStyle}" Text="{Binding Pomodoro.CycleText}" />
+                        <TextBlock Style="{StaticResource PomodoroMetaStyle}" Text="{Binding Pomodoro.LinkedItemText}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Margin="0,12,0,0">
+                        <ComboBox
+                            Margin="0,0,0,10"
+                            DisplayMemberPath="Text"
+                            IsEnabled="{Binding Pomodoro.IsIdle}"
+                            ItemsSource="{Binding Pomodoro.AvailableItems}"
+                            SelectedValue="{Binding Pomodoro.SelectedLinkedItemId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedValuePath="Id"
+                            Style="{StaticResource PomodoroComboBoxStyle}" />
+
+                        <UniformGrid Columns="4" Rows="1">
+                            <Button
+                                Margin="0,0,8,0"
+                                Click="OnPomodoroStartOrResumeClick"
+                                Content="开始/继续"
+                                IsEnabled="{Binding Pomodoro.CanStartOrResume}"
+                                Style="{StaticResource PomodoroPrimaryButtonStyle}" />
+                            <Button
+                                Margin="0,0,8,0"
+                                Click="OnPomodoroPauseClick"
+                                Content="暂停"
+                                IsEnabled="{Binding Pomodoro.CanPause}"
+                                Style="{StaticResource PomodoroSecondaryButtonStyle}" />
+                            <Button
+                                Margin="0,0,8,0"
+                                Click="OnPomodoroSkipClick"
+                                Content="跳过"
+                                IsEnabled="{Binding Pomodoro.CanSkip}"
+                                Style="{StaticResource PomodoroSecondaryButtonStyle}" />
+                            <Button
+                                Click="OnPomodoroResetClick"
+                                Content="重置"
+                                IsEnabled="{Binding Pomodoro.CanReset}"
+                                Style="{StaticResource PomodoroSecondaryButtonStyle}" />
+                        </UniformGrid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
             <!--  Items Section with ScrollViewer  -->
             <ScrollViewer
-                Grid.Row="1"
+                Grid.Row="2"
                 MaxHeight="600"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
