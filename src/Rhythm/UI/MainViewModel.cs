@@ -84,8 +84,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _service.State.RemoveItem(itemVm.Id);
         itemVm.PropertyChanged -= OnItemPropertyChanged;
         Items.Remove(itemVm);
+        Pomodoro.SynchronizeLinkedItemAvailability();
         _service.Persist();
-        Pomodoro.RefreshBindings();
     }
 
     public void RenameItem(ItemViewModel itemVm, string newText)
@@ -119,8 +119,6 @@ public sealed class MainViewModel : INotifyPropertyChanged
     {
         var changed = _service.State.RolloverIfNeeded(DateOnly.FromDateTime(DateTime.Today));
         if (!changed) return;
-
-        _service.Persist();
         var snapshot = _service.State.Items.ToArray();
 
         foreach (var item in Items)
@@ -134,8 +132,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
             Items.Add(vm);
         }
 
+        Pomodoro.SynchronizeLinkedItemAvailability();
+        _service.Persist();
         OnPropertyChanged(nameof(CurrentDate));
-        Pomodoro.RefreshBindings();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

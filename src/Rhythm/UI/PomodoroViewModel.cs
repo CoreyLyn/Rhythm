@@ -146,9 +146,13 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
         var adjustedSession = NormalizeSession(normalizedConfig, _machine.Session);
         var previousConfig = _machine.Config;
         var previousSession = _machine.Session;
+        var previousSelectedLinkedItemId = _selectedLinkedItemId;
 
         _machine = new PomodoroStateMachine(normalizedConfig, adjustedSession);
-        SyncSelectedLinkedItemIdFromSession();
+        if (adjustedSession.Status == PomodoroStatus.Idle)
+            SetSelectedLinkedItemId(ResolveValidLinkedItemId(previousSelectedLinkedItemId));
+        else
+            SyncSelectedLinkedItemIdFromSession();
         PersistAndNotifyIfChanged(previousConfig, previousSession);
     }
 
@@ -162,18 +166,14 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
 
     public void RefreshBindings()
     {
-        var previousSession = _machine.Session;
-        var previousConfig = _machine.Config;
-        var changed = false;
+        OnPropertyChanged(nameof(LinkedItemText));
+    }
 
-        if (_selectedLinkedItemId is { } selectedId && !AvailableItems.Any(item => item.Id == selectedId))
-        {
-            _selectedLinkedItemId = null;
-            OnPropertyChanged(nameof(SelectedLinkedItemId));
-            changed = true;
-        }
+    public bool SynchronizeLinkedItemAvailability()
+    {
+        var sessionChanged = false;
 
-        if (_machine.Session.LinkedItemId is { } linkedId && !AvailableItems.Any(item => item.Id == linkedId))
+        if (_machine.Session.LinkedItemId is { } linkedItemId && !HasAvailableItem(linkedItemId))
         {
             _machine = new PomodoroStateMachine(
                 _machine.Config,
@@ -181,19 +181,21 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
                 {
                     LinkedItemId = null,
                 });
-            SyncSelectedLinkedItemIdFromSession();
-            changed = true;
+            sessionChanged = true;
         }
 
-        if (changed)
-        {
-            if (!PersistAndNotifyIfChanged(previousConfig, previousSession))
-                OnPropertyChanged(nameof(LinkedItemText));
-        }
-        else
-        {
+        var normalizedSelectedLinkedItemId = ResolveValidLinkedItemId(_selectedLinkedItemId);
+        var selectedChanged = SetSelectedLinkedItemId(normalizedSelectedLinkedItemId);
+
+        if (sessionChanged)
+            _service.State.SetPomodoroSession(_machine.Session);
+
+        if (sessionChanged)
+            OnPropertyChanged(string.Empty);
+        else if (selectedChanged)
             OnPropertyChanged(nameof(LinkedItemText));
-        }
+
+        return sessionChanged || selectedChanged;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -280,16 +282,24 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
     }
 
     private Guid? ResolveValidLinkedItemId(Guid? itemId)
-        => itemId is { } value && AvailableItems.Any(item => item.Id == value) ? value : null;
+        => itemId is { } value && HasAvailableItem(value) ? value : null;
+
+    private bool HasAvailableItem(Guid itemId)
+        => AvailableItems.Any(item => item.Id == itemId);
 
     private void SyncSelectedLinkedItemIdFromSession()
     {
-        var linkedItemId = ResolveValidLinkedItemId(_machine.Session.LinkedItemId);
-        if (_selectedLinkedItemId == linkedItemId)
-            return;
+        SetSelectedLinkedItemId(ResolveValidLinkedItemId(_machine.Session.LinkedItemId));
+    }
 
-        _selectedLinkedItemId = linkedItemId;
+    private bool SetSelectedLinkedItemId(Guid? itemId)
+    {
+        if (_selectedLinkedItemId == itemId)
+            return false;
+
+        _selectedLinkedItemId = itemId;
         OnPropertyChanged(nameof(SelectedLinkedItemId));
+        return true;
     }
 
     private bool PersistAndNotifyIfChanged(PomodoroSessionSnapshot previousSession)
