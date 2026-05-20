@@ -86,14 +86,29 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" Margin="0,12,0,0">
-                        <ComboBox
-                            Margin="0,0,0,10"
-                            DisplayMemberPath="Text"
-                            IsEnabled="{Binding Pomodoro.IsIdle}"
-                            ItemsSource="{Binding Pomodoro.AvailableItems}"
-                            SelectedValue="{Binding Pomodoro.SelectedLinkedItemId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            SelectedValuePath="Id"
-                            Style="{StaticResource PomodoroComboBoxStyle}" />
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ComboBox
+                                Grid.Column="0"
+                                Margin="0,0,8,0"
+                                DisplayMemberPath="Text"
+                                IsEnabled="{Binding Pomodoro.IsIdle}"
+                                ItemsSource="{Binding Pomodoro.AvailableItems}"
+                                SelectedValue="{Binding Pomodoro.SelectedLinkedItemId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedValuePath="Id"
+                                Style="{StaticResource PomodoroComboBoxStyle}" />
+
+                            <Button
+                                Grid.Column="1"
+                                Click="OnPomodoroClearLinkedItemClick"
+                                Content="清空"
+                                IsEnabled="{Binding Pomodoro.IsIdle}"
+                                Style="{StaticResource PomodoroCompactButtonStyle}" />
+                        </Grid>
 
                         <UniformGrid Columns="4" Rows="1">
                             <Button

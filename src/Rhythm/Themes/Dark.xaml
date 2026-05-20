@@ -146,6 +146,11 @@
         </Style.Triggers>
     </Style>
 
+    <Style x:Key="PomodoroCompactButtonStyle" BasedOn="{StaticResource PomodoroSecondaryButtonStyle}" TargetType="Button">
+        <Setter Property="MinWidth" Value="52" />
+        <Setter Property="Padding" Value="8,7" />
+    </Style>
+
     <Style x:Key="PomodoroComboBoxItemStyle" TargetType="ComboBoxItem">
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
         <Setter Property="Background" Value="Transparent" />
@@ -262,6 +267,7 @@
                         </ToggleButton>
 
                         <Popup
+                            x:Name="PART_Popup"
                             AllowsTransparency="True"
                             Focusable="False"
                             IsOpen="{TemplateBinding IsDropDownOpen}"

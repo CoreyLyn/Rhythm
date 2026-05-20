@@ -194,6 +194,12 @@ public partial class MainWindow : Window
             app.OpenPomodoroSettings();
     }
 
+    private void OnPomodoroClearLinkedItemClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel { Pomodoro.IsIdle: true } vm)
+            vm.Pomodoro.SelectedLinkedItemId = null;
+    }
+
     private void OnWindowKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
