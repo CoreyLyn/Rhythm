@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -11,7 +12,9 @@ namespace Rhythm;
 
 public partial class PomodoroSettingsWindow : Window
 {
+    private const int MaxMinutes = int.MaxValue / 60;
     private readonly bool _enableTransparency;
+    private bool _isFinalizingClose;
 
     public PomodoroSettingsWindow(PomodoroConfig config, bool enableTransparency = true)
     {
@@ -43,6 +46,7 @@ public partial class PomodoroSettingsWindow : Window
         LongBreakEveryTextBox.Text = config.LongBreakEvery.ToString();
         AutoStartNextPhaseCheckBox.IsChecked = config.AutoStartNextPhase;
         Loaded += OnLoaded;
+        Closing += OnClosing;
     }
 
     public PomodoroConfig ResultConfig { get; private set; }
@@ -60,9 +64,9 @@ public partial class PomodoroSettingsWindow : Window
 
     private void OnSaveClick(object sender, RoutedEventArgs e)
     {
-        if (!TryParsePositiveInteger(FocusMinutesTextBox.Text, "专注时长", out var focusMinutes) ||
-            !TryParsePositiveInteger(ShortBreakMinutesTextBox.Text, "短休息时长", out var shortBreakMinutes) ||
-            !TryParsePositiveInteger(LongBreakMinutesTextBox.Text, "长休息时长", out var longBreakMinutes) ||
+        if (!TryParseMinutes(FocusMinutesTextBox.Text, "专注时长", out var focusMinutes) ||
+            !TryParseMinutes(ShortBreakMinutesTextBox.Text, "短休息时长", out var shortBreakMinutes) ||
+            !TryParseMinutes(LongBreakMinutesTextBox.Text, "长休息时长", out var longBreakMinutes) ||
             !TryParsePositiveInteger(LongBreakEveryTextBox.Text, "长休息轮次", out var longBreakEvery))
         {
             return;
@@ -75,17 +79,28 @@ public partial class PomodoroSettingsWindow : Window
             LongBreakEvery: longBreakEvery,
             AutoStartNextPhase: AutoStartNextPhaseCheckBox.IsChecked == true);
 
-        DialogResult = true;
+        CloseWithResult(true);
     }
 
-    private void OnCancelClick(object sender, RoutedEventArgs e) => DialogResult = false;
+    private void OnCancelClick(object sender, RoutedEventArgs e) => CloseWithResult(false);
 
     private void OnWindowKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key != Key.Escape) return;
 
-        DialogResult = false;
+        CloseWithResult(false);
         e.Handled = true;
+    }
+
+    private void OnClosing(object? sender, CancelEventArgs e)
+    {
+        if (_isFinalizingClose || DialogResult.HasValue)
+        {
+            return;
+        }
+
+        e.Cancel = true;
+        CloseWithResult(false);
     }
 
     private void OnWindowChromeMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -101,6 +116,29 @@ public partial class PomodoroSettingsWindow : Window
         DragMove();
     }
 
+    private void CloseWithResult(bool result)
+    {
+        if (_isFinalizingClose)
+        {
+            return;
+        }
+
+        _isFinalizingClose = true;
+        DialogResult = result;
+    }
+
+    private bool TryParseMinutes(string? text, string fieldName, out int value)
+    {
+        if (int.TryParse(text?.Trim(), out value) && value > 0 && value <= MaxMinutes)
+        {
+            return true;
+        }
+
+        MessageBox.Show(this, $"{fieldName}必须是 1 到 {MaxMinutes} 之间的整数。", "Rhythm", MessageBoxButton.OK, MessageBoxImage.Warning);
+        value = 0;
+        return false;
+    }
+
     private bool TryParsePositiveInteger(string? text, string fieldName, out int value)
     {
         if (int.TryParse(text?.Trim(), out value) && value > 0)
@@ -108,7 +146,7 @@ public partial class PomodoroSettingsWindow : Window
             return true;
         }
 
-        MessageBox.Show($"{fieldName}必须是大于 0 的整数。", "Rhythm", MessageBoxButton.OK, MessageBoxImage.Warning);
+        MessageBox.Show(this, $"{fieldName}必须是大于 0 的整数。", "Rhythm", MessageBoxButton.OK, MessageBoxImage.Warning);
         value = 0;
         return false;
     }
