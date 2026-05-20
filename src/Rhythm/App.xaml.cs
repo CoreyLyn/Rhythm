@@ -416,7 +416,13 @@ public partial class App : Application
         var phase = pomodoro.PhaseType;
         var status = pomodoro.Status;
         var completedFocusCountToday = GetCompletedFocusCountToday();
-        var shouldNotify = showNotification && ShouldNotifyPomodoroPhaseChange(phase, status, completedFocusCountToday);
+        var shouldNotify = showNotification && ShouldNotifyPomodoroPhaseChange(
+            phase,
+            status,
+            _lastPomodoroPhase,
+            _lastPomodoroStatus,
+            completedFocusCountToday,
+            _lastCompletedFocusCountToday);
 
         _lastPomodoroPhase = phase;
         _lastPomodoroStatus = status;
@@ -428,16 +434,22 @@ public partial class App : Application
             ShowPomodoroNotification(phase);
     }
 
-    private bool ShouldNotifyPomodoroPhaseChange(PomodoroPhaseType phase, PomodoroStatus status, int? completedFocusCountToday)
+    private static bool ShouldNotifyPomodoroPhaseChange(
+        PomodoroPhaseType phase,
+        PomodoroStatus status,
+        PomodoroPhaseType? previousPhase,
+        PomodoroStatus? previousStatus,
+        int? completedFocusCountToday,
+        int? previousCompletedFocusCountToday)
     {
-        if (status == PomodoroStatus.Idle || _lastPomodoroPhase is null || _lastPomodoroStatus is null)
+        if (status == PomodoroStatus.Idle || previousPhase is null || previousStatus is null)
             return false;
 
-        if (_lastPomodoroPhase != phase || _lastPomodoroStatus == PomodoroStatus.Idle)
+        if (previousPhase != phase)
             return true;
 
         return completedFocusCountToday is { } currentCount
-            && _lastCompletedFocusCountToday is { } previousCount
+            && previousCompletedFocusCountToday is { } previousCount
             && currentCount > previousCount;
     }
 

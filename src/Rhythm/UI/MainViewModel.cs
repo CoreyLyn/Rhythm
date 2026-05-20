@@ -132,6 +132,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             Items.Add(vm);
         }
 
+        Pomodoro.ReloadFromState();
         Pomodoro.SynchronizeLinkedItemAvailability();
         _service.Persist();
         OnPropertyChanged(nameof(CurrentDate));

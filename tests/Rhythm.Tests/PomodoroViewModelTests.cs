@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Rhythm;
 using Rhythm.State;
 using Rhythm.UI;
@@ -72,6 +73,33 @@ public sealed class PomodoroViewModelTests : IDisposable
         Assert.Equal(itemId, viewModel.Pomodoro.SelectedLinkedItemId);
         Assert.Equal(itemId, context.State.PomodoroSession.LinkedItemId);
         Assert.Equal("关联事项：Daily focus", viewModel.Pomodoro.LinkedItemText);
+    }
+
+    [Fact]
+    public void RolloverAndRefresh_ResetsCompletedFocusCountToday()
+    {
+        var itemId = Guid.NewGuid();
+        var context = CreateMainViewModel(
+            lastResetDate: DateOnly.FromDateTime(DateTime.Today.AddDays(-1)),
+            items:
+            [
+                new RhythmItem(itemId, "Daily focus"),
+            ],
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                1200,
+                2,
+                3,
+                itemId,
+                DateTimeOffset.Now.AddMinutes(-5),
+                DateTimeOffset.Now.AddMinutes(-5)));
+        var viewModel = context.ViewModel;
+
+        viewModel.RolloverAndRefresh();
+
+        Assert.Equal(0, context.State.PomodoroSession.CompletedFocusCountToday);
+        Assert.Equal("本轮 2/4，今日 0 个番茄", viewModel.Pomodoro.CycleText);
     }
 
     [Fact]
@@ -165,6 +193,61 @@ public sealed class PomodoroViewModelTests : IDisposable
         Assert.DoesNotContain(viewModel.Items, item => item.Id == linkedItemId);
     }
 
+    [Fact]
+    public void Constructor_NormalizesInvalidStatusToIdle()
+    {
+        var itemId = Guid.NewGuid();
+        var context = CreateMainViewModel(
+            items:
+            [
+                new RhythmItem(itemId, "Write tests"),
+            ],
+            pomodoroSession: new PomodoroSessionSnapshot(
+                (PomodoroStatus)999,
+                PomodoroPhaseType.ShortBreak,
+                42,
+                1,
+                2,
+                itemId,
+                DateTimeOffset.Now.AddMinutes(-3),
+                DateTimeOffset.Now.AddMinutes(-1)));
+        var pomodoro = context.ViewModel.Pomodoro;
+
+        Assert.Equal(PomodoroStatus.Idle, pomodoro.Status);
+        Assert.Equal(PomodoroPhaseType.Focus, pomodoro.PhaseType);
+        Assert.True(pomodoro.IsIdle);
+        Assert.True(pomodoro.CanStartOrResume);
+        Assert.Equal(PomodoroStatus.Idle, context.State.PomodoroSession.Status);
+    }
+
+    [Fact]
+    public void ShouldNotifyPomodoroPhaseChange_DoesNotNotifyWhenManuallyStartingFromIdle()
+    {
+        var shouldNotify = InvokeShouldNotifyPomodoroPhaseChange(
+            phase: PomodoroPhaseType.Focus,
+            status: PomodoroStatus.Running,
+            previousPhase: PomodoroPhaseType.Focus,
+            previousStatus: PomodoroStatus.Idle,
+            completedFocusCountToday: 0,
+            previousCompletedFocusCountToday: 0);
+
+        Assert.False(shouldNotify);
+    }
+
+    [Fact]
+    public void ShouldNotifyPomodoroPhaseChange_NotifiesWhenCompletedCountIncreasesWithoutPhaseChange()
+    {
+        var shouldNotify = InvokeShouldNotifyPomodoroPhaseChange(
+            phase: PomodoroPhaseType.Focus,
+            status: PomodoroStatus.Running,
+            previousPhase: PomodoroPhaseType.Focus,
+            previousStatus: PomodoroStatus.Running,
+            completedFocusCountToday: 3,
+            previousCompletedFocusCountToday: 2);
+
+        Assert.True(shouldNotify);
+    }
+
     public void Dispose()
     {
         try
@@ -201,5 +284,30 @@ public sealed class PomodoroViewModelTests : IDisposable
         });
 
         return (new MainViewModel(new RhythmStateService(state)), state);
+    }
+
+    private static bool InvokeShouldNotifyPomodoroPhaseChange(
+        PomodoroPhaseType phase,
+        PomodoroStatus status,
+        PomodoroPhaseType? previousPhase,
+        PomodoroStatus? previousStatus,
+        int? completedFocusCountToday,
+        int? previousCompletedFocusCountToday)
+    {
+        var method = typeof(App).GetMethod(
+            "ShouldNotifyPomodoroPhaseChange",
+            BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+
+        return (bool)method!.Invoke(
+            null,
+            [
+                phase,
+                status,
+                previousPhase,
+                previousStatus,
+                completedFocusCountToday,
+                previousCompletedFocusCountToday,
+            ])!;
     }
 }

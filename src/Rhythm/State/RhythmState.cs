@@ -35,6 +35,10 @@ public sealed class RhythmState
             return false;
         _items.RemoveAll(item => item.Kind == RhythmItemKind.OneTime && _completed.Contains(item.Id));
         _completed.Clear();
+        PomodoroSession = PomodoroSession with
+        {
+            CompletedFocusCountToday = 0,
+        };
         LastResetDate = today;
         return true;
     }

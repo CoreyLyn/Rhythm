@@ -56,6 +56,32 @@ public class RhythmStateTests
     }
 
     [Fact]
+    public void RolloverIfNeeded_ResetsCompletedFocusCountToday()
+    {
+        var linkedItemId = Guid.NewGuid();
+        var state = new RhythmState(new StateDocument
+        {
+            LastResetDate = new DateOnly(2026, 5, 8),
+            PomodoroSession = new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                600,
+                2,
+                5,
+                linkedItemId,
+                new DateTimeOffset(2026, 5, 8, 9, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2026, 5, 8, 9, 15, 0, TimeSpan.Zero)),
+        });
+
+        state.RolloverIfNeeded(new DateOnly(2026, 5, 9));
+
+        Assert.Equal(0, state.PomodoroSession.CompletedFocusCountToday);
+        Assert.Equal(2, state.PomodoroSession.CompletedFocusCountInCycle);
+        Assert.Equal(PomodoroStatus.Running, state.PomodoroSession.Status);
+        Assert.Equal(linkedItemId, state.PomodoroSession.LinkedItemId);
+    }
+
+    [Fact]
     public void RolloverIfNeeded_KeepsIncompleteOneTimeItems()
     {
         var state = NewState();

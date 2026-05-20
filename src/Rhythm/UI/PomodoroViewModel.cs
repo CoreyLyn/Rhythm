@@ -164,6 +164,33 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
         return PersistAndNotifyIfChanged(previousSession);
     }
 
+    public bool ReloadFromState()
+    {
+        var normalizedConfig = NormalizeConfig(_service.State.PomodoroConfig);
+        var normalizedSession = NormalizeSession(normalizedConfig, _service.State.PomodoroSession);
+        var previousConfig = _machine.Config;
+        var previousSession = _machine.Session;
+        var previousSelectedLinkedItemId = _selectedLinkedItemId;
+
+        _machine = new PomodoroStateMachine(normalizedConfig, normalizedSession);
+
+        if (normalizedSession.Status == PomodoroStatus.Idle)
+            SetSelectedLinkedItemId(ResolveValidLinkedItemId(previousSelectedLinkedItemId));
+        else
+            SyncSelectedLinkedItemIdFromSession();
+
+        if (normalizedConfig != _service.State.PomodoroConfig || normalizedSession != _service.State.PomodoroSession)
+            PersistMachineState();
+
+        if (previousConfig == _machine.Config
+            && previousSession == _machine.Session
+            && previousSelectedLinkedItemId == _selectedLinkedItemId)
+            return false;
+
+        OnPropertyChanged(string.Empty);
+        return true;
+    }
+
     public void RefreshBindings()
     {
         OnPropertyChanged(nameof(LinkedItemText));
@@ -244,7 +271,9 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
         ArgumentNullException.ThrowIfNull(config);
         ArgumentNullException.ThrowIfNull(session);
 
-        if (session.Status == PomodoroStatus.Idle)
+        var status = Enum.IsDefined(session.Status) ? session.Status : PomodoroStatus.Idle;
+
+        if (status == PomodoroStatus.Idle)
         {
             return session with
             {
@@ -268,6 +297,7 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
 
         return session with
         {
+            Status = status,
             PhaseType = phaseType,
             RemainingSeconds = remainingSeconds,
         };
