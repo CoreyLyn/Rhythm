@@ -24,6 +24,49 @@ public sealed class PomodoroViewModelTests : IDisposable
     }
 
     [Fact]
+    public void SelectedLinkedItemId_InIdle_ShowsPendingLinkedItemText()
+    {
+        var itemId = Guid.NewGuid();
+        var context = CreateMainViewModel(
+            items:
+            [
+                new RhythmItem(itemId, "Test task"),
+            ]);
+        var viewModel = context.ViewModel;
+
+        Assert.True(viewModel.Pomodoro.IsIdle);
+        Assert.Null(viewModel.Pomodoro.SelectedLinkedItemId);
+        Assert.Equal("关联事项：未关联事项", viewModel.Pomodoro.LinkedItemText);
+
+        viewModel.Pomodoro.SelectedLinkedItemId = itemId;
+
+        Assert.Equal(itemId, viewModel.Pomodoro.SelectedLinkedItemId);
+        Assert.Equal("待关联事项：Test task", viewModel.Pomodoro.LinkedItemText);
+    }
+
+    [Fact]
+    public void AdvanceToNow_InIdle_KeepsSelectedLinkedItemId()
+    {
+        var itemId = Guid.NewGuid();
+        var now = DateTimeOffset.Now;
+        var context = CreateMainViewModel(
+            items:
+            [
+                new RhythmItem(itemId, "Test task"),
+            ],
+            pomodoroConfig: new PomodoroConfig(FocusMinutes: 25));
+        var viewModel = context.ViewModel;
+
+        viewModel.Pomodoro.SelectedLinkedItemId = itemId;
+
+        viewModel.Pomodoro.AdvanceToNow();
+
+        Assert.True(viewModel.Pomodoro.IsIdle);
+        Assert.Equal(itemId, viewModel.Pomodoro.SelectedLinkedItemId);
+        Assert.Equal("待关联事项：Test task", viewModel.Pomodoro.LinkedItemText);
+    }
+
+    [Fact]
     public void ApplyConfig_KeepsIdleSelectedLinkedItem()
     {
         var itemId = Guid.NewGuid();

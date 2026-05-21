@@ -81,7 +81,7 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
     public string RemainingText => FormatRemaining(_machine.Session.RemainingSeconds);
 
     public string CycleText =>
-        $"本轮 {Math.Min(_machine.Session.CompletedFocusCountInCycle, Math.Max(1, Config.LongBreakEvery))}/{Math.Max(1, Config.LongBreakEvery)}，今日 {_machine.Session.CompletedFocusCountToday} 个番茄";
+        $"本轮 {Math.Min(_machine.Session.CompletedFocusCountInCycle, Math.Max(1, Config.LongBreakEvery))}/{Math.Max(1, Config.LongBreakEvery)}，今日 {_machine.Session.CompletedFocusCountToday} 个番茄钟";
 
     public string LinkedItemText => ResolveLinkedItemText();
 
@@ -211,11 +211,12 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
         PersistAndNotifyIfChanged(previousConfig, previousSession);
     }
 
-    public bool AdvanceToNow()
+public bool AdvanceToNow()
     {
         var previousSession = _machine.Session;
         _machine.AdvanceTo(_nowProvider());
-        SyncSelectedLinkedItemIdFromSession();
+        if (_machine.Session.Status != PomodoroStatus.Idle)
+            SyncSelectedLinkedItemIdFromSession();
         return PersistAndNotifyIfChanged(previousSession);
     }
 

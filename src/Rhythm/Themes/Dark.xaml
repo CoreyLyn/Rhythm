@@ -117,7 +117,10 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <Style x:Key="PomodoroExpandedPanelStyle" BasedOn="{StaticResource PomodoroCardStyle}" TargetType="Border">
+    <Style
+        x:Key="PomodoroExpandedPanelStyle"
+        BasedOn="{StaticResource PomodoroCardStyle}"
+        TargetType="Border">
         <Setter Property="Padding" Value="14" />
         <Setter Property="Margin" Value="0,8,0,0" />
     </Style>
@@ -255,7 +258,10 @@
         </Setter>
     </Style>
 
-    <Style x:Key="PomodoroPrimaryButtonStyle" BasedOn="{StaticResource PomodoroButtonBaseStyle}" TargetType="Button">
+    <Style
+        x:Key="PomodoroPrimaryButtonStyle"
+        BasedOn="{StaticResource PomodoroButtonBaseStyle}"
+        TargetType="Button">
         <Setter Property="Background" Value="{StaticResource PomodoroButtonBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource PomodoroButtonBrush}" />
         <Style.Triggers>
@@ -270,7 +276,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="PomodoroSecondaryButtonStyle" BasedOn="{StaticResource PomodoroButtonBaseStyle}" TargetType="Button">
+    <Style
+        x:Key="PomodoroSecondaryButtonStyle"
+        BasedOn="{StaticResource PomodoroButtonBaseStyle}"
+        TargetType="Button">
         <Setter Property="Background" Value="{StaticResource PomodoroSecondaryButtonBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource PomodoroCardBorderBrush}" />
         <Style.Triggers>
@@ -283,12 +292,18 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="PomodoroGhostButtonStyle" BasedOn="{StaticResource PomodoroSecondaryButtonStyle}" TargetType="Button">
+    <Style
+        x:Key="PomodoroGhostButtonStyle"
+        BasedOn="{StaticResource PomodoroSecondaryButtonStyle}"
+        TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{StaticResource PomodoroStripBorderBrush}" />
     </Style>
 
-    <Style x:Key="PomodoroCompactButtonStyle" BasedOn="{StaticResource PomodoroSecondaryButtonStyle}" TargetType="Button">
+    <Style
+        x:Key="PomodoroCompactButtonStyle"
+        BasedOn="{StaticResource PomodoroSecondaryButtonStyle}"
+        TargetType="Button">
         <Setter Property="MinWidth" Value="52" />
         <Setter Property="Padding" Value="8,7" />
     </Style>
@@ -307,9 +322,7 @@
                         Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
                         CornerRadius="6">
-                        <ContentPresenter
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="Center" />
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
@@ -361,12 +374,15 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
-                                            <ContentPresenter
+                                            <TextBlock
+                                                x:Name="SelectedItemText"
                                                 Grid.Column="0"
                                                 Margin="12,0,12,0"
                                                 VerticalAlignment="Center"
-                                                Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
-                                                ContentTemplate="{Binding SelectionBoxItemTemplate, RelativeSource={RelativeSource AncestorType=ComboBox}}" />
+                                                FontSize="15"
+                                                FontWeight="Medium"
+                                                Foreground="{StaticResource ForegroundBrush}"
+                                                Text="{Binding SelectedItem.Text, RelativeSource={RelativeSource AncestorType=ComboBox}}" />
 
                                             <TextBlock
                                                 x:Name="PlaceholderText"
@@ -383,9 +399,9 @@
                                                 VerticalAlignment="Center"
                                                 Data="M 0 0 L 4 4 L 8 0"
                                                 Stroke="{StaticResource PomodoroMutedBrush}"
+                                                StrokeEndLineCap="Round"
                                                 StrokeLineJoin="Round"
                                                 StrokeStartLineCap="Round"
-                                                StrokeEndLineCap="Round"
                                                 StrokeThickness="1.6" />
                                         </Grid>
                                     </Border>
@@ -402,6 +418,7 @@
                                         </Trigger>
                                         <DataTrigger Binding="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ComboBox}}" Value="{x:Null}">
                                             <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="SelectedItemText" Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
