@@ -48,96 +48,144 @@
             </StackPanel>
 
             <!--  Pomodoro Section  -->
-            <Border Grid.Row="1" Style="{StaticResource PomodoroCardStyle}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0">
+            <StackPanel Grid.Row="1" Margin="0,0,0,12">
+                <ToggleButton
+                    IsChecked="{Binding Pomodoro.IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Style="{StaticResource PomodoroStripToggleButtonStyle}">
+                    <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Border Grid.Column="0" Style="{StaticResource PomodoroPhaseBadgeStyle}">
-                            <TextBlock Style="{StaticResource PomodoroPhaseTextStyle}" Text="{Binding Pomodoro.PhaseLabel}" />
-                        </Border>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="8" Height="8" Margin="0,0,10,0">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{StaticResource PomodoroIdleDotBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="Focus">
+                                                <Setter Property="Fill" Value="{StaticResource PomodoroFocusDotBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="ShortBreak">
+                                                <Setter Property="Fill" Value="{StaticResource PomodoroShortBreakDotBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="LongBreak">
+                                                <Setter Property="Fill" Value="{StaticResource PomodoroLongBreakDotBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="Paused">
+                                                <Setter Property="Fill" Value="{StaticResource PomodoroPausedDotBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Style="{StaticResource PomodoroStripPhaseStyle}" Text="{Binding Pomodoro.CompactPhaseLabel}" />
+                        </StackPanel>
 
-                        <Button
+                        <TextBlock
                             Grid.Column="1"
-                            Margin="10,0,0,0"
-                            Click="OnPomodoroSettingsClick"
-                            Content="设置"
-                            Style="{StaticResource PomodoroSecondaryButtonStyle}" />
+                            Margin="12,0,12,0"
+                            Style="{StaticResource PomodoroStripContextStyle}"
+                            Text="{Binding Pomodoro.CompactContextText}" />
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource PomodoroStripTimerStyle}" Text="{Binding Pomodoro.RemainingText}" />
+                            <TextBlock Margin="10,0,0,0" Style="{StaticResource PomodoroStripChevronStyle}" Text="›" />
+                        </StackPanel>
                     </Grid>
+                </ToggleButton>
 
-                    <TextBlock
-                        Grid.Row="1"
-                        Style="{StaticResource PomodoroTimerStyle}"
-                        Text="{Binding Pomodoro.RemainingText}" />
+                <Border
+                    Margin="0,8,0,0"
+                    Style="{StaticResource PomodoroExpandedPanelStyle}"
+                    Visibility="{Binding Pomodoro.IsExpanded, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="2" Margin="0,8,0,0">
-                        <TextBlock Style="{StaticResource PomodoroMetaStyle}" Text="{Binding Pomodoro.CycleText}" />
-                        <TextBlock Style="{StaticResource PomodoroMetaStyle}" Text="{Binding Pomodoro.LinkedItemText}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="3" Margin="0,12,0,0">
-                        <Grid Margin="0,0,0,10">
+                        <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource PomodoroExpandedPhaseStyle}" Text="{Binding Pomodoro.PhaseLabel}" />
+                                <TextBlock Style="{StaticResource PomodoroExpandedTimerStyle}" Text="{Binding Pomodoro.RemainingText}" />
+                                <TextBlock Style="{StaticResource PomodoroMetaStyle}" Text="{Binding Pomodoro.CycleText}" />
+                            </StackPanel>
+
+                            <Button
+                                Grid.Column="1"
+                                Click="OnPomodoroSettingsClick"
+                                Content="设置"
+                                Style="{StaticResource PomodoroGhostButtonStyle}" />
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="0,12,0,0">
                             <ComboBox
-                                Grid.Column="0"
-                                Margin="0,0,8,0"
                                 DisplayMemberPath="Text"
                                 IsEnabled="{Binding Pomodoro.IsIdle}"
                                 ItemsSource="{Binding Pomodoro.AvailableItems}"
                                 SelectedValue="{Binding Pomodoro.SelectedLinkedItemId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 SelectedValuePath="Id"
-                                Style="{StaticResource PomodoroComboBoxStyle}" />
+                                Style="{StaticResource PomodoroComboBoxStyle}"
+                                Visibility="{Binding Pomodoro.IsIdle, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                            <TextBlock
+                                Style="{StaticResource PomodoroMetaStyle}"
+                                Text="{Binding Pomodoro.LinkedItemText}"
+                                Visibility="{Binding Pomodoro.IsIdle, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                        </Grid>
+
+                        <Grid Grid.Row="2" Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button
+                                Grid.Column="0"
+                                Click="OnPomodoroPrimaryActionClick"
+                                Content="{Binding Pomodoro.PrimaryActionText}"
+                                IsEnabled="{Binding Pomodoro.CanExecutePrimaryAction}"
+                                Style="{StaticResource PomodoroPrimaryButtonStyle}" />
 
                             <Button
                                 Grid.Column="1"
-                                Click="OnPomodoroClearLinkedItemClick"
-                                Content="清空"
-                                IsEnabled="{Binding Pomodoro.IsIdle}"
-                                Style="{StaticResource PomodoroCompactButtonStyle}" />
-                        </Grid>
-
-                        <UniformGrid Columns="4" Rows="1">
-                            <Button
-                                Margin="0,0,8,0"
-                                Click="OnPomodoroStartOrResumeClick"
-                                Content="开始/继续"
-                                IsEnabled="{Binding Pomodoro.CanStartOrResume}"
-                                Style="{StaticResource PomodoroPrimaryButtonStyle}" />
-                            <Button
-                                Margin="0,0,8,0"
-                                Click="OnPomodoroPauseClick"
-                                Content="暂停"
-                                IsEnabled="{Binding Pomodoro.CanPause}"
-                                Style="{StaticResource PomodoroSecondaryButtonStyle}" />
-                            <Button
-                                Margin="0,0,8,0"
+                                Margin="8,0,0,0"
                                 Click="OnPomodoroSkipClick"
                                 Content="跳过"
                                 IsEnabled="{Binding Pomodoro.CanSkip}"
-                                Style="{StaticResource PomodoroSecondaryButtonStyle}" />
+                                Style="{StaticResource PomodoroGhostButtonStyle}" />
+
                             <Button
+                                Grid.Column="2"
+                                Margin="8,0,0,0"
                                 Click="OnPomodoroResetClick"
                                 Content="重置"
                                 IsEnabled="{Binding Pomodoro.CanReset}"
-                                Style="{StaticResource PomodoroSecondaryButtonStyle}" />
-                        </UniformGrid>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                                Style="{StaticResource PomodoroGhostButtonStyle}" />
+
+                            <Button
+                                Grid.Column="3"
+                                Margin="8,0,0,0"
+                                Click="OnPomodoroClearLinkedItemClick"
+                                Content="清空"
+                                IsEnabled="{Binding Pomodoro.IsIdle}"
+                                Style="{StaticResource PomodoroGhostButtonStyle}"
+                                Visibility="{Binding Pomodoro.IsIdle, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        </Grid>
+                    </Grid>
+                </Border>
+            </StackPanel>
 
             <!--  Items Section with ScrollViewer  -->
             <ScrollViewer

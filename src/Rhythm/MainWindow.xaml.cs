@@ -164,6 +164,12 @@ public partial class MainWindow : Window
             app.ShutdownFromUi();
     }
 
+    private void OnPomodoroPrimaryActionClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel { Pomodoro.CanExecutePrimaryAction: true } vm)
+            vm.Pomodoro.ExecutePrimaryAction();
+    }
+
     private void OnPomodoroStartOrResumeClick(object sender, RoutedEventArgs e)
     {
         if (DataContext is MainViewModel { Pomodoro.CanStartOrResume: true } vm)
