@@ -142,7 +142,7 @@ public sealed class PomodoroViewModelTests : IDisposable
         viewModel.RolloverAndRefresh();
 
         Assert.Equal(0, context.State.PomodoroSession.CompletedFocusCountToday);
-        Assert.Equal("本轮 2/4，今日 0 个番茄", viewModel.Pomodoro.CycleText);
+        Assert.Equal("本轮 2/4，今日 0 个番茄钟", viewModel.Pomodoro.CycleText);
     }
 
     [Fact]
