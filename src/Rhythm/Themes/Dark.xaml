@@ -294,10 +294,15 @@
 
     <Style
         x:Key="PomodoroGhostButtonStyle"
-        BasedOn="{StaticResource PomodoroSecondaryButtonStyle}"
+        BasedOn="{StaticResource PomodoroButtonBaseStyle}"
         TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="{StaticResource PomodoroStripBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style
