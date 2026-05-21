@@ -220,7 +220,8 @@
         <Setter Property="FontSize" Value="12" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
-        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="Padding" Value="12,9" />
+        <Setter Property="MinHeight" Value="34" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -231,7 +232,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="7">
+                        CornerRadius="8">
                         <ContentPresenter
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -283,7 +284,6 @@
     </Style>
 
     <Style x:Key="PomodoroGhostButtonStyle" BasedOn="{StaticResource PomodoroSecondaryButtonStyle}" TargetType="Button">
-        <Setter Property="Padding" Value="10,6" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{StaticResource PomodoroStripBorderBrush}" />
     </Style>
