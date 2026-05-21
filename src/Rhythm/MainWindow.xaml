@@ -42,10 +42,55 @@
             </Grid.RowDefinitions>
 
             <!--  Header Section  -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,12">
-                <TextBlock Style="{StaticResource HeaderDateStyle}" Text="{Binding CurrentDate}" />
-                <TextBlock Style="{StaticResource HeaderStatsStyle}" Text="{Binding ProgressText}" />
-            </StackPanel>
+            <Grid Grid.Row="0" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Style="{StaticResource HeaderDateStyle}" Text="{Binding CurrentDate}" />
+                    <TextBlock Style="{StaticResource HeaderStatsStyle}" Text="{Binding ProgressText}" />
+                </StackPanel>
+
+                <ToggleButton
+                    Grid.Column="1"
+                    IsChecked="{Binding Pomodoro.IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Style="{StaticResource PomodoroMiniContainerStyle}">
+                    <StackPanel>
+                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                            <Ellipse
+                                Width="8"
+                                Height="8"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{StaticResource PomodoroIdleDotBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="Focus">
+                                                <Setter Property="Fill" Value="{StaticResource PomodoroFocusDotBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="ShortBreak">
+                                                <Setter Property="Fill" Value="{StaticResource PomodoroShortBreakDotBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="LongBreak">
+                                                <Setter Property="Fill" Value="{StaticResource PomodoroLongBreakDotBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="Paused">
+                                                <Setter Property="Fill" Value="{StaticResource PomodoroPausedDotBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Style="{StaticResource PomodoroMiniPhaseStyle}" Text="{Binding Pomodoro.CompactPhaseLabel}" />
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource PomodoroMiniTimerStyle}" Text="{Binding Pomodoro.RemainingText}" />
+                    </StackPanel>
+                </ToggleButton>
+            </Grid>
 
             <!--  Pomodoro Section  -->
             <StackPanel Grid.Row="1" Margin="0,0,0,12">
