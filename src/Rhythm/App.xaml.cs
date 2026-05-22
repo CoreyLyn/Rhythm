@@ -284,7 +284,6 @@ public partial class App : Application
     {
         if (_mainWindow == null) return;
         if (!_mainWindow.IsVisible) _mainWindow.Show();
-        _mainWindow.Activate();
     }
 
     private void HideMainWindow() => _mainWindow?.Hide();
