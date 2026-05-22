@@ -106,11 +106,26 @@ public partial class MainWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg == Win32.WM_WINDOWPOSCHANGING)
+        switch (msg)
         {
-            var wp = Marshal.PtrToStructure<Win32.WINDOWPOS>(lParam);
-            wp.hwndInsertAfter = Win32.HWND_BOTTOM;
-            Marshal.StructureToPtr(wp, lParam, fDeleteOld: false);
+            case Win32.WM_WINDOWPOSCHANGING:
+            {
+                var wp = Marshal.PtrToStructure<Win32.WINDOWPOS>(lParam);
+                wp.hwndInsertAfter = Win32.HWND_BOTTOM;
+                Marshal.StructureToPtr(wp, lParam, fDeleteOld: false);
+                break;
+            }
+            case Win32.WM_WINDOWPOSCHANGED:
+            {
+                Win32.SetWindowPos(hwnd, Win32.HWND_BOTTOM, 0, 0, 0, 0,
+                    Win32.SWP_NOMOVE | Win32.SWP_NOSIZE | Win32.SWP_NOACTIVATE);
+                break;
+            }
+            case Win32.WM_MOUSEACTIVATE:
+            {
+                handled = true;
+                return new IntPtr(Win32.MA_NOACTIVATE);
+            }
         }
         return IntPtr.Zero;
     }
