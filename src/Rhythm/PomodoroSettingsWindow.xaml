@@ -10,7 +10,7 @@
     KeyDown="OnWindowKeyDown"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
-    WindowStartupLocation="CenterOwner"
+    WindowStartupLocation="CenterScreen"
     WindowStyle="None">
 
     <Window.Resources>

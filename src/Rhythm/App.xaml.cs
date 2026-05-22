@@ -297,16 +297,6 @@ public partial class App : Application
     {
         var enableTransparency = _viewModel?.EnableTransparency ?? true;
         var aboutWindow = new AboutWindow(enableTransparency);
-        if (_mainWindow?.IsVisible == true)
-        {
-            aboutWindow.Owner = _mainWindow;
-        }
-        else
-        {
-            aboutWindow.ShowInTaskbar = true;
-            aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        }
-
         aboutWindow.ShowDialog();
     }
 
@@ -316,10 +306,7 @@ public partial class App : Application
     {
         if (_viewModel == null) return;
         var enableTransparency = _viewModel.EnableTransparency;
-        var w = new EditItemsWindow(_viewModel, enableTransparency)
-        {
-            Owner = _mainWindow?.IsVisible == true ? _mainWindow : null,
-        };
+        var w = new EditItemsWindow(_viewModel, enableTransparency);
         w.ShowDialog();
     }
 
@@ -329,15 +316,6 @@ public partial class App : Application
 
         var enableTransparency = _viewModel.EnableTransparency;
         var window = new PomodoroSettingsWindow(_viewModel.Pomodoro.Config, enableTransparency);
-        if (_mainWindow?.IsVisible == true)
-        {
-            window.Owner = _mainWindow;
-        }
-        else
-        {
-            window.ShowInTaskbar = true;
-            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        }
 
         if (window.ShowDialog() == true)
         {
