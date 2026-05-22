@@ -6,7 +6,6 @@
     Title="Rhythm"
     Width="320"
     MinHeight="80"
-    KeyDown="OnWindowKeyDown"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     SizeToContent="Height"

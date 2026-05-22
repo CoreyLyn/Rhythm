@@ -222,15 +222,6 @@ public partial class MainWindow : Window
             vm.Pomodoro.SelectedLinkedItemId = null;
     }
 
-    private void OnWindowKeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Escape)
-        {
-            Hide();
-            e.Handled = true;
-        }
-    }
-
     private void OnBorderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton != MouseButton.Left) return;
