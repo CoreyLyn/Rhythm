@@ -7,14 +7,19 @@ internal static class Win32
 {
     public const int GWL_EXSTYLE = -20;
     public const int WS_EX_TOOLWINDOW = 0x00000080;
+    public const int WS_EX_NOACTIVATE = 0x08000000;
 
     public static readonly IntPtr HWND_BOTTOM = new(1);
 
     public const int WM_WINDOWPOSCHANGING = 0x0046;
+    public const int WM_WINDOWPOSCHANGED = 0x0047;
+    public const int WM_MOUSEACTIVATE = 0x0021;
 
     public const uint SWP_NOSIZE = 0x0001;
     public const uint SWP_NOMOVE = 0x0002;
     public const uint SWP_NOACTIVATE = 0x0010;
+
+    public const int MA_NOACTIVATE = 3;
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
     public static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
