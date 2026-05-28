@@ -278,6 +278,17 @@ public sealed class PomodoroViewModelTests : IDisposable
     }
 
     [Fact]
+    public void ProgressProjection_ShowsFullRingWhenSessionIsIdle()
+    {
+        var context = CreateMainViewModel(
+            pomodoroConfig: new PomodoroConfig(FocusMinutes: 30));
+        var pomodoro = context.ViewModel.Pomodoro;
+
+        Assert.Equal(1800, pomodoro.PhaseTotalSeconds);
+        Assert.Equal(1.0, pomodoro.ProgressRatio, precision: 5);
+    }
+
+    [Fact]
     public void CompactStripTexts_ShowLinkedItemDuringRunningFocus()
     {
         var itemId = Guid.NewGuid();
@@ -301,6 +312,26 @@ public sealed class PomodoroViewModelTests : IDisposable
         Assert.Equal("AI Architect", pomodoro.CompactContextText);
         Assert.Equal("暂停", pomodoro.PrimaryActionText);
         Assert.Equal("Focus", pomodoro.CompactToneKey);
+    }
+
+    [Fact]
+    public void ProgressProjection_UsesRemainingFocusSecondsWhenRunning()
+    {
+        var context = CreateMainViewModel(
+            pomodoroConfig: new PomodoroConfig(FocusMinutes: 25),
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                750,
+                0,
+                0,
+                null,
+                DateTimeOffset.Now.AddMinutes(-12),
+                DateTimeOffset.Now.AddMinutes(-12)));
+        var pomodoro = context.ViewModel.Pomodoro;
+
+        Assert.Equal(1500, pomodoro.PhaseTotalSeconds);
+        Assert.Equal(0.5, pomodoro.ProgressRatio, precision: 5);
     }
 
     [Fact]
@@ -346,6 +377,26 @@ public sealed class PomodoroViewModelTests : IDisposable
     }
 
     [Fact]
+    public void ProgressProjection_UsesRemainingSecondsWhenPaused()
+    {
+        var context = CreateMainViewModel(
+            pomodoroConfig: new PomodoroConfig(FocusMinutes: 25),
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Paused,
+                PomodoroPhaseType.Focus,
+                375,
+                1,
+                2,
+                null,
+                DateTimeOffset.Now.AddMinutes(-10),
+                DateTimeOffset.Now.AddMinutes(-4)));
+        var pomodoro = context.ViewModel.Pomodoro;
+
+        Assert.Equal(1500, pomodoro.PhaseTotalSeconds);
+        Assert.Equal(0.25, pomodoro.ProgressRatio, precision: 5);
+    }
+
+    [Fact]
     public void CompactStripTexts_ShowCompletedSummaryDuringRunningShortBreak()
     {
         var context = CreateMainViewModel(
@@ -364,6 +415,26 @@ public sealed class PomodoroViewModelTests : IDisposable
         Assert.Equal("上一轮已完成", pomodoro.CompactContextText);
         Assert.Equal("暂停", pomodoro.PrimaryActionText);
         Assert.Equal("ShortBreak", pomodoro.CompactToneKey);
+    }
+
+    [Fact]
+    public void ProgressProjection_UsesShortBreakDuration()
+    {
+        var context = CreateMainViewModel(
+            pomodoroConfig: new PomodoroConfig(FocusMinutes: 25, ShortBreakMinutes: 5),
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.ShortBreak,
+                240,
+                1,
+                2,
+                null,
+                DateTimeOffset.Now.AddMinutes(-1),
+                DateTimeOffset.Now.AddMinutes(-1)));
+        var pomodoro = context.ViewModel.Pomodoro;
+
+        Assert.Equal(300, pomodoro.PhaseTotalSeconds);
+        Assert.Equal(0.8, pomodoro.ProgressRatio, precision: 5);
     }
 
     [Fact]

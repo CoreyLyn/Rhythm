@@ -80,6 +80,18 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
 
     public string RemainingText => FormatRemaining(_machine.Session.RemainingSeconds);
 
+    public int PhaseTotalSeconds => GetPhaseDurationSeconds(Config, PhaseType);
+
+    public double ProgressRatio
+    {
+        get
+        {
+            var totalSeconds = Math.Max(1, PhaseTotalSeconds);
+            var remainingSeconds = Math.Clamp(_machine.Session.RemainingSeconds, 0, totalSeconds);
+            return (double)remainingSeconds / totalSeconds;
+        }
+    }
+
     public string CycleText =>
         $"本轮 {Math.Min(_machine.Session.CompletedFocusCountInCycle, Math.Max(1, Config.LongBreakEvery))}/{Math.Max(1, Config.LongBreakEvery)}，今日 {_machine.Session.CompletedFocusCountToday} 个番茄钟";
 
@@ -211,7 +223,7 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
         PersistAndNotifyIfChanged(previousConfig, previousSession);
     }
 
-public bool AdvanceToNow()
+    public bool AdvanceToNow()
     {
         var previousSession = _machine.Session;
         _machine.AdvanceTo(_nowProvider());

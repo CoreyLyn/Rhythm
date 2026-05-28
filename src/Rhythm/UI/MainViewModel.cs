@@ -19,6 +19,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public string CurrentDate => DateTime.Now.ToString("M月d日 dddd", CultureInfo.GetCultureInfo("zh-CN"));
 
+    public string CurrentMonthDay => DateTime.Now.ToString("M月d日", CultureInfo.GetCultureInfo("zh-CN"));
+
+    public string CurrentWeekday => DateTime.Now.ToString("dddd", CultureInfo.GetCultureInfo("zh-CN"));
+
     public int CompletedCount => Items.Count(i => i.IsCompleted);
 
     public int TotalCount => Items.Count;
@@ -136,6 +140,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
         Pomodoro.SynchronizeLinkedItemAvailability();
         _service.Persist();
         OnPropertyChanged(nameof(CurrentDate));
+        OnPropertyChanged(nameof(CurrentMonthDay));
+        OnPropertyChanged(nameof(CurrentWeekday));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
