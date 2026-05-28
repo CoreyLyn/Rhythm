@@ -125,10 +125,10 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <Style
-        x:Key="PomodoroExpandedPanelStyle"
-        BasedOn="{StaticResource PomodoroCardStyle}"
-        TargetType="Border">
+    <Style x:Key="PomodoroExpandedPanelStyle" TargetType="Border">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
         <Setter Property="Padding" Value="16" />
         <Setter Property="Margin" Value="0,0,0,16" />
     </Style>
