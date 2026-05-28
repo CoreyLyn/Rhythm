@@ -5,6 +5,7 @@
     Title="关于 Rhythm"
     Width="360"
     Height="300"
+    Icon="Resources/icon.ico"
     KeyDown="OnWindowKeyDown"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
@@ -175,7 +176,7 @@
                             Height="34"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Source="pack://application:,,,/Resources/icon.ico" />
+                            Source="pack://application:,,,/Resources/logo.png" />
                     </Border>
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">

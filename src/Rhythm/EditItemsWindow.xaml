@@ -5,6 +5,7 @@
     Title="Rhythm - 编辑事项"
     Width="460"
     Height="620"
+    Icon="Resources/icon.ico"
     MinWidth="420"
     MinHeight="520"
     KeyDown="OnWindowKeyDown"

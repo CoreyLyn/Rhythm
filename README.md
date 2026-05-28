@@ -1,5 +1,9 @@
 # Rhythm
 
+<p align="center">
+  <img src="docs/logo.png" alt="Rhythm logo" width="132" />
+</p>
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Rhythm 是一个轻量的 Windows 桌面清单与番茄钟工具。它适合放在屏幕角落，帮你记住今天要反复完成的小事项，同时用番茄钟把注意力稳稳拉回当前任务。

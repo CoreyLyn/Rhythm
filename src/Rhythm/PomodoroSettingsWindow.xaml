@@ -5,6 +5,7 @@
     Title="Rhythm - 番茄钟设置"
     Width="420"
     Height="430"
+    Icon="Resources/icon.ico"
     MinWidth="420"
     MinHeight="430"
     KeyDown="OnWindowKeyDown"
