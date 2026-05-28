@@ -2,55 +2,81 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Rhythm 是一个 Windows 桌面常驻便签，用来放每天重复执行的小清单，也可以临时加入一次性事项：勾选每日事项后跨过本地午夜自动重置，勾选一次性事项后第二天不再显示。它固定在桌面底层，不进入任务栏或 Alt-Tab，适合放在屏幕角落当作轻量提醒。
+Rhythm 是一个轻量的 Windows 桌面清单与番茄钟工具。它适合放在屏幕角落，帮你记住今天要反复完成的小事项，同时用番茄钟把注意力稳稳拉回当前任务。
 
-## 适用环境
+![Rhythm 软件截图](docs/screenshot.png)
+
+## 你可以用它做什么
+
+- 把每日例行动作放在桌面上，例如运动、读书、复盘、整理工作重点。
+- 临时加入只做一次的事项，完成后跨到第二天自动移除。
+- 在清单旁边开启番茄钟，按专注、短休息、长休息循环推进。
+- 把番茄钟关联到某个事项，让当前专注目标更清楚。
+- 关闭窗口时隐藏到托盘，需要时再从托盘唤回。
+- 开启开机启动，让它每天自动出现在你的工作环境里。
+
+## 设计取向
+
+Rhythm 不是复杂的项目管理软件。它更像一张常驻在桌面上的小纸条：
+
+- 不需要账号。
+- 不联网。
+- 不上传任何清单或使用记录。
+- 不打断你的工作流。
+- 不进入任务栏或 Alt-Tab。
+- 默认固定在桌面底层，适合长期放在屏幕边缘。
+
+## 运行环境
 
 - Windows 10 / 11 x64
-- 用户运行发布版时无需预装 .NET runtime：`publish/Rhythm.exe` 是 win-x64 self-contained 单文件发布目标
-- 开发需要在 Windows 上安装 .NET 10 SDK；项目 TargetFramework 为 `net10.0-windows`
+- 使用发布版时无需预装 .NET Runtime
+- 开发环境需要 Windows 与 .NET 10 SDK
 
-## 核心功能
-
-- 桌面便签：暗色、圆角、半透明深灰的紧凑窗口
-- 桌面固定：窗口保持在 z-order 最底，不抢焦点、不进 Alt-Tab、不进任务栏
-- 每日清单：勾选完成项，本地午夜自动把当天完成状态清空
-- 一次性事项：编辑窗口可添加非每日重复事项，完成后跨到第二天自动移除
-- 番茄钟：支持专注 / 短休息 / 长休息循环，可暂停、继续、跳过、重置，并可关联到某个清单事项
-- 事项编辑：新增、删除、重命名、上下排序
-- 托盘常驻：双击托盘图标显示窗口，右键菜单提供显示、隐藏、编辑、透明效果、开机启动、关于和退出
-- 关闭即隐藏：窗口关闭按钮只隐藏到托盘，只有托盘菜单的 "退出" 会终止进程
-- 位置记忆：窗口可拖动，保存位置；屏幕变化导致位置越界时回退到默认位置
-- 开机启动：托盘菜单可切换，写入当前用户的 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
-
-## 用户运行
-
-发布产物放在 `publish/` 后，直接双击：
+发布版目标是 `win-x64` self-contained 单文件应用，入口位于：
 
 ```powershell
 .\publish\Rhythm.exe
 ```
 
-首次启动会创建本地状态文件，并预填 3 个示例事项：
+## 快速开始
 
-- 早起冥想 5 分钟
-- 运动 20 分钟
-- 读书 30 分钟
+1. 双击 `publish/Rhythm.exe` 启动 Rhythm。
+2. 首次启动会自动创建本地状态文件，并预置 3 个示例事项：
+   - 早起冥想 5 分钟
+   - 运动 20 分钟
+   - 读书 30 分钟
+3. 右键托盘图标，选择“编辑事项...”替换成自己的清单。
+4. 在主窗口顶部点击番茄钟状态条，可展开完整番茄钟面板。
+5. 如果希望每天自动启动，在托盘菜单勾选“开机启动”。
 
-可以在托盘菜单 "编辑事项..." 中替换这些示例。新增事项时可选择 "每日" 或 "一次性"：每日事项跨日后保留并重置完成状态，一次性事项完成后跨到第二天自动移除。
+关闭窗口按钮只会把 Rhythm 隐藏到托盘；真正退出请使用托盘菜单里的“退出”。
+
+## 日常操作
+
+| 操作 | 说明 |
+|---|---|
+| 勾选每日事项 | 今天标记为完成，本地午夜后自动重置 |
+| 新增一次性事项 | 适合临时任务；完成后跨到第二天自动移除 |
+| 拖动窗口 | 保存窗口位置；屏幕变化导致越界时会回到默认位置 |
+| 展开番茄钟 | 查看当前阶段、剩余时间、轮次和关联事项 |
+| 暂停 / 继续 | 保留当前番茄钟进度 |
+| 跳过阶段 | 直接进入下一段专注或休息 |
+| 重置番茄钟 | 回到空闲状态，等待重新开始 |
+| 托盘双击 | 显示主窗口 |
+| 托盘右键菜单 | 显示、隐藏、编辑、透明效果、开机启动、关于、退出 |
 
 ## 本地数据
 
-Rhythm 的清单与窗口状态只保存在本机用户目录：
+Rhythm 的清单、窗口位置、透明效果和番茄钟状态只保存在本机：
 
 ```text
 %APPDATA%\Rhythm\state.json
 ```
 
-状态文件包含：
+状态文件主要包含：
 
 - `schemaVersion`
-- `items[]`（每项包含每日 / 一次性类型）
+- `items[]`
 - `completedToday[]`
 - `lastResetDate`
 - `windowPos`
@@ -58,20 +84,20 @@ Rhythm 的清单与窗口状态只保存在本机用户目录：
 - `pomodoroConfig`
 - `pomodoroSession`
 
-如果状态文件缺失或 JSON 损坏，应用会回退到默认状态；保存采用临时文件替换的方式，降低半写入导致下次启动失败的风险。
+如果状态文件缺失或 JSON 损坏，应用会回退到默认状态。保存时使用临时文件替换，降低半写入导致下次启动失败的风险。
 
 ## 隐私与安全
 
-- 应用本地运行，不需要账号
-- 不做网络请求
-- 不上传遥测、清单内容或使用记录
-- 开机启动只写当前用户的 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
-- 安全问题报告方式见 [`SECURITY.md`](SECURITY.md)
+- 应用本地运行，不需要账号。
+- 应用不做网络请求。
+- 应用不上传遥测、清单内容或使用记录。
+- 开机启动只写入当前用户的 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`。
+- 安全问题报告方式见 [`SECURITY.md`](SECURITY.md)。
 
 ## 卸载
 
-1. 如果启用过开机启动，先在托盘菜单取消勾选 "开机启动"。
-2. 在托盘菜单选择 "退出"。
+1. 如果启用过开机启动，先在托盘菜单取消勾选“开机启动”。
+2. 在托盘菜单选择“退出”。
 3. 删除发布目录中的 `Rhythm.exe`。
 4. 如需删除所有本地数据，删除 `%APPDATA%\Rhythm\`。
 
@@ -111,31 +137,18 @@ dotnet publish src/Rhythm/Rhythm.csproj `
 .\publish\Rhythm.exe
 ```
 
-## 架构
+## 项目结构
 
-| 层 | 职责 | 关键文件 |
+| 模块 | 职责 | 关键文件 |
 |---|---|---|
 | 应用启动与托盘 | 初始化状态、创建主窗口、构建托盘菜单、安排午夜重置 | `src/Rhythm/App.xaml.cs` |
-| 状态机 | 每日重置、一次性事项跨日移除、勾选、增删改移等纯 C# 逻辑，可单测 | `src/Rhythm/State/RhythmState.cs` |
+| 清单状态 | 每日重置、一次性事项跨日移除、勾选、增删改移等纯 C# 逻辑 | `src/Rhythm/State/RhythmState.cs` |
 | 状态结构 | `state.json` 的 schema 与记录类型 | `src/Rhythm/State/StateSchema.cs` |
 | 持久化 | System.Text.Json 读写，损坏回退默认，保存使用 temp + replace | `src/Rhythm/State/StateStore.cs` |
-| 路径 | `%APPDATA%\Rhythm\state.json` 等本地路径 | `src/Rhythm/AppPaths.cs` |
-| Win32 互操作 | `HWND_BOTTOM`、`WS_EX_TOOLWINDOW`、`WM_WINDOWPOSCHANGING` 等桌面固定能力 | `src/Rhythm/Interop/Win32.cs` |
-| 自启动 | 读写 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` | `src/Rhythm/Autostart/AutostartManager.cs` |
-| ViewModel | `INotifyPropertyChanged`、`ObservableCollection`、UI 操作封装 | `src/Rhythm/UI/MainViewModel.cs` |
-| 视图 | 主便签窗口、编辑窗口、关于窗口和主题资源 | `src/Rhythm/MainWindow.xaml`、`src/Rhythm/EditItemsWindow.xaml`、`src/Rhythm/AboutWindow.xaml`、`src/Rhythm/Themes/Dark.xaml` |
+| 番茄钟 | 专注 / 休息阶段推进、暂停、继续、跳过、重置和配置应用 | `src/Rhythm/State/PomodoroStateMachine.cs`、`src/Rhythm/UI/PomodoroViewModel.cs` |
+| 本地路径 | `%APPDATA%\Rhythm\state.json` 等本地路径 | `src/Rhythm/AppPaths.cs` |
+| Win32 互操作 | 桌面底层固定、工具窗口样式、窗口位置约束 | `src/Rhythm/Interop/Win32.cs` |
+| 自启动 | 读写当前用户 Run 注册表项 | `src/Rhythm/Autostart/AutostartManager.cs` |
+| ViewModel | UI 状态投影、命令封装、窗口数据绑定 | `src/Rhythm/UI/` |
+| 视图 | 主窗口、编辑窗口、关于窗口和主题资源 | `src/Rhythm/*.xaml`、`src/Rhythm/Themes/Dark.xaml` |
 | 测试 | 状态机与持久化的 xUnit 覆盖 | `tests/Rhythm.Tests/` |
-
-## 已知限制
-
-- 不支持多设备同步、云存储或账号
-- 番茄钟阶段切换仅支持托盘短提示，不支持声音提醒、系统通知中心集成或提醒历史
-- 不支持多 list、多 profile 或标签分组
-- 不记录历史完成记录、热力图或连续打卡统计
-- v1 固定暗色外观，不跟随系统暗 / 浅主题切换
-- 不支持全局快捷键
-- 不提供字体、圆角等外观细项配置；透明效果仅支持开关
-- 不使用 Mica 背景效果：WPF `AllowsTransparency=True` 与 DWM Mica 互斥，v1 优先保留圆角和全窗透明
-- 不支持 macOS、Linux 或移动端
-
-任务规划与决策记录见 `.trellis/tasks/`。
