@@ -40,7 +40,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" Margin="0,0,0,14">
+            <Grid Grid.Row="0" Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -61,7 +61,8 @@
                             Margin="10,0,0,0"
                             Click="OnEditClick"
                             Content="+"
-                            Style="{StaticResource AddTaskButtonStyle}" />
+                            Style="{StaticResource AddTaskButtonStyle}"
+                            ToolTip="编辑事项" />
                     </StackPanel>
                 </StackPanel>
 
@@ -244,7 +245,7 @@
                 </Grid>
             </Border>
 
-            <Grid Grid.Row="2" Margin="0,2,0,0">
+            <Grid Grid.Row="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -257,7 +258,7 @@
 
                 <ScrollViewer
                     Grid.Row="1"
-                    Margin="0,8,0,0"
+                    Margin="0,4,0,0"
                     MaxHeight="440"
                     HorizontalScrollBarVisibility="Disabled"
                     VerticalScrollBarVisibility="Auto">
