@@ -137,7 +137,7 @@
                         Grid.Row="1"
                         Width="184"
                         Height="184"
-                        Margin="0,2,0,16"
+                        Margin="0,2,0,12"
                         HorizontalAlignment="Center">
                         <ui:PomodoroProgressRing
                             Width="170"
@@ -146,7 +146,7 @@
                             VerticalAlignment="Center"
                             Progress="{Binding Pomodoro.ProgressRatio}"
                             ProgressBrush="{StaticResource PomodoroButtonBrush}"
-                            StrokeThickness="12"
+                            StrokeThickness="10"
                             TrackBrush="{StaticResource PomodoroRingTrackBrush}" />
 
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -199,7 +199,7 @@
 
                         <Button
                             Grid.Column="1"
-                            Margin="14,0"
+                            Margin="10,0"
                             Click="OnPomodoroPrimaryActionClick"
                             Content="{Binding Pomodoro.PrimaryActionText}"
                             IsEnabled="{Binding Pomodoro.CanExecutePrimaryAction}"

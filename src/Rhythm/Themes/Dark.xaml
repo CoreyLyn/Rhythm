@@ -205,7 +205,6 @@
     <Style x:Key="PomodoroRingPhaseStyle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource PomodoroMutedBrush}" />
         <Setter Property="FontSize" Value="13" />
-        <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
     </Style>
 
@@ -303,8 +302,8 @@
         BasedOn="{StaticResource PomodoroPrimaryButtonStyle}"
         TargetType="Button">
         <Setter Property="Foreground" Value="#07110C" />
-        <Setter Property="MinWidth" Value="116" />
-        <Setter Property="MinHeight" Value="48" />
+        <Setter Property="MinWidth" Value="100" />
+        <Setter Property="MinHeight" Value="38" />
         <Setter Property="Padding" Value="22,12" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontWeight" Value="Bold" />
@@ -316,7 +315,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="24">
+                        CornerRadius="18">
                         <ContentPresenter
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -343,11 +342,12 @@
         x:Key="PomodoroRoundButtonStyle"
         BasedOn="{StaticResource PomodoroButtonBaseStyle}"
         TargetType="Button">
-        <Setter Property="Width" Value="48" />
-        <Setter Property="Height" Value="48" />
-        <Setter Property="MinHeight" Value="48" />
+        <Setter Property="Width" Value="38" />
+        <Setter Property="Height" Value="38" />
+        <Setter Property="MinHeight" Value="38" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="Foreground" Value="{StaticResource PomodoroMutedBrush}" />
         <Setter Property="Background" Value="{StaticResource PomodoroSecondaryButtonBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource PomodoroCardBorderBrush}" />
@@ -360,7 +360,17 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="24">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="{TemplateBinding FontFamily}"
+                            FontSize="{TemplateBinding FontSize}"
+                            FontWeight="{TemplateBinding FontWeight}"
+                            Foreground="{TemplateBinding Foreground}"
+                            LineHeight="{TemplateBinding FontSize}"
+                            LineStackingStrategy="BlockLineHeight"
+                            Text="{TemplateBinding Content}"
+                            TextAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
