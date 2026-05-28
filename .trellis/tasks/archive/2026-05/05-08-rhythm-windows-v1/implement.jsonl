@@ -1,1 +1,0 @@
-{"file": ".trellis/tasks/05-08-rhythm-windows-v1/research/tech-stack.md", "reason": "Windows 原生 UI 栈选型 + 推荐组合；implement 时按 WPF + .NET 8 + 模式 C 桌面固定 (HWND_BOTTOM + WS_EX_TOOLWINDOW) + HKCU Run 自启 + WPF-UI Mica 路径落地"}

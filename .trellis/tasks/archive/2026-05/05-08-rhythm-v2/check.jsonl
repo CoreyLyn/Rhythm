@@ -1,2 +1,0 @@
-{"file": ".trellis/spec/frontend/wpf-desktop-app.md", "reason": "验证改动未破坏透明窗口 / 托盘 / 自启等既有集成；确认视觉项走手动验收（§6 Tests Required）"}
-{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "检查 ControlTemplate / Style 是否复用既有 BrushKey，避免硬编码颜色"}

@@ -1,2 +1,0 @@
-{"file": ".trellis/spec/frontend/wpf-desktop-app.md", "reason": "WPF 透明窗口 + 托盘 + 自启约定，含 Mica 互斥规则、状态机分层、关闭=隐藏等核心 convention"}
-{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend spec 索引，了解项目整体前端规范结构"}
