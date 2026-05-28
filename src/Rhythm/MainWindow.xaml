@@ -145,9 +145,25 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Progress="{Binding Pomodoro.ProgressRatio}"
-                            ProgressBrush="{StaticResource PomodoroButtonBrush}"
                             StrokeThickness="10"
-                            TrackBrush="{StaticResource PomodoroRingTrackBrush}" />
+                            TrackBrush="{StaticResource PomodoroRingTrackBrush}">
+                            <ui:PomodoroProgressRing.Style>
+                                <Style TargetType="{x:Type ui:PomodoroProgressRing}">
+                                    <Setter Property="ProgressBrush" Value="{StaticResource PomodoroButtonBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="Focus">
+                                            <Setter Property="ProgressBrush" Value="{StaticResource PomodoroFocusDotBrush}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="LongBreak">
+                                            <Setter Property="ProgressBrush" Value="{StaticResource PomodoroLongBreakDotBrush}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="Paused">
+                                            <Setter Property="ProgressBrush" Value="{StaticResource PomodoroPausedDotBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:PomodoroProgressRing.Style>
+                        </ui:PomodoroProgressRing>
 
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource PomodoroRingTimerStyle}" Text="{Binding Pomodoro.RemainingText}" />
@@ -203,7 +219,7 @@
                             Click="OnPomodoroPrimaryActionClick"
                             Content="{Binding Pomodoro.PrimaryActionText}"
                             IsEnabled="{Binding Pomodoro.CanExecutePrimaryAction}"
-                            Style="{StaticResource PomodoroPrimaryPillButtonStyle}" />
+                            Style="{StaticResource PomodoroTonePrimaryPillButtonStyle}" />
 
                         <Button
                             Grid.Column="2"

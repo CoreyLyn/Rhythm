@@ -28,9 +28,9 @@
     <SolidColorBrush x:Key="PomodoroChevronBrush" Color="#7F8B9D" />
     <SolidColorBrush x:Key="PomodoroRingTrackBrush" Color="#263140" />
     <SolidColorBrush x:Key="PomodoroIdleDotBrush" Color="#667386" />
-    <SolidColorBrush x:Key="PomodoroFocusDotBrush" Color="#38D08A" />
+    <SolidColorBrush x:Key="PomodoroFocusDotBrush" Color="#F56F57" />
     <SolidColorBrush x:Key="PomodoroShortBreakDotBrush" Color="#38D08A" />
-    <SolidColorBrush x:Key="PomodoroLongBreakDotBrush" Color="#42C7D9" />
+    <SolidColorBrush x:Key="PomodoroLongBreakDotBrush" Color="#00B1DA" />
     <SolidColorBrush x:Key="PomodoroPausedDotBrush" Color="#E2A84F" />
 
     <!--  Header Styles  -->
@@ -336,6 +336,63 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style
+        x:Key="PomodoroTonePrimaryPillButtonStyle"
+        BasedOn="{StaticResource PomodoroButtonBaseStyle}"
+        TargetType="Button">
+        <Setter Property="Foreground" Value="#07110C" />
+        <Setter Property="Background" Value="{StaticResource PomodoroButtonBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource PomodoroButtonBrush}" />
+        <Setter Property="MinWidth" Value="100" />
+        <Setter Property="MinHeight" Value="38" />
+        <Setter Property="Padding" Value="22,12" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="ButtonBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="18">
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.96" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.86" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource MutedForegroundBrush}" />
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.48" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="Focus">
+                <Setter Property="Background" Value="{StaticResource PomodoroFocusDotBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource PomodoroFocusDotBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="LongBreak">
+                <Setter Property="Background" Value="{StaticResource PomodoroLongBreakDotBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource PomodoroLongBreakDotBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Pomodoro.CompactToneKey}" Value="Paused">
+                <Setter Property="Background" Value="{StaticResource PomodoroPausedDotBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource PomodoroPausedDotBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style

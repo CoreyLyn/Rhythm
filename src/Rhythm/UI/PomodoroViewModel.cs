@@ -126,7 +126,7 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
 
     public bool CanReset => !IsIdle || _machine.Session.CompletedFocusCountToday > 0;
 
-    public string PrimaryActionText => IsRunning ? "暂停" : IsPaused ? "继续" : "开始专注";
+    public string PrimaryActionText => IsRunning ? "暂停" : IsPaused ? "继续" : "开始";
 
     public bool CanExecutePrimaryAction => CanPause || CanStartOrResume;
 
