@@ -204,6 +204,12 @@ public partial class MainWindow : Window
             vm.Pomodoro.SkipCurrentPhase();
     }
 
+    private void OnPomodoroCompleteClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel { Pomodoro.CanCompleteCurrentPhase: true } vm)
+            vm.Pomodoro.CompleteCurrentPhase();
+    }
+
     private void OnPomodoroResetClick(object sender, RoutedEventArgs e)
     {
         if (DataContext is MainViewModel { Pomodoro.CanReset: true } vm)

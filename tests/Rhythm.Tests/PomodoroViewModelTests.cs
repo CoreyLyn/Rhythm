@@ -272,7 +272,7 @@ public sealed class PomodoroViewModelTests : IDisposable
 
         Assert.Equal("准备专注", pomodoro.CompactPhaseLabel);
         Assert.Equal("可开始 30 分钟", pomodoro.CompactContextText);
-        Assert.Equal("开始专注", pomodoro.PrimaryActionText);
+        Assert.Equal("开始", pomodoro.PrimaryActionText);
         Assert.Equal("Idle", pomodoro.CompactToneKey);
         Assert.False(pomodoro.IsExpanded);
     }
@@ -512,6 +512,28 @@ public sealed class PomodoroViewModelTests : IDisposable
         pausedContext.ViewModel.Pomodoro.ExecutePrimaryAction();
 
         Assert.Equal(PomodoroStatus.Running, pausedContext.ViewModel.Pomodoro.Status);
+    }
+
+    [Fact]
+    public void CompleteCurrentPhase_CountsFocusAndTransitionsToLongBreak()
+    {
+        var context = CreateMainViewModel(
+            pomodoroConfig: new PomodoroConfig(FocusMinutes: 25, ShortBreakMinutes: 5, LongBreakMinutes: 15, LongBreakEvery: 4),
+            pomodoroSession: new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                900,
+                3,
+                7,
+                Guid.NewGuid(),
+                DateTimeOffset.Now.AddMinutes(-10),
+                DateTimeOffset.Now.AddMinutes(-10)));
+
+        context.ViewModel.Pomodoro.CompleteCurrentPhase();
+
+        Assert.Equal(PomodoroPhaseType.LongBreak, context.ViewModel.Pomodoro.PhaseType);
+        Assert.Equal(0, context.State.PomodoroSession.CompletedFocusCountInCycle);
+        Assert.Equal(8, context.State.PomodoroSession.CompletedFocusCountToday);
     }
 
     [Fact]

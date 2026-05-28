@@ -205,6 +205,64 @@ public sealed class PomodoroStateMachineTests
     }
 
     [Fact]
+    public void CompleteCurrentPhase_CountsFocusAsCompleted()
+    {
+        var linkedItemId = Guid.NewGuid();
+        var machine = new PomodoroStateMachine(
+            new PomodoroConfig(FocusMinutes: 25, ShortBreakMinutes: 5),
+            new PomodoroSessionSnapshot());
+
+        machine.Start(StartTime, linkedItemId);
+        machine.AdvanceTo(StartTime.AddMinutes(10));
+
+        var session = machine.CompleteCurrentPhase(StartTime.AddMinutes(10));
+
+        Assert.Equal(
+            new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.ShortBreak,
+                300,
+                1,
+                1,
+                null,
+                StartTime.AddMinutes(10),
+                StartTime.AddMinutes(10)),
+            session);
+        Assert.Equal(session, machine.Session);
+    }
+
+    [Fact]
+    public void CompleteCurrentPhase_StartsLongBreakWhenCycleCompletes()
+    {
+        var machine = new PomodoroStateMachine(
+            new PomodoroConfig(FocusMinutes: 25, ShortBreakMinutes: 5, LongBreakMinutes: 15, LongBreakEvery: 4),
+            new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.Focus,
+                900,
+                3,
+                7,
+                Guid.NewGuid(),
+                StartTime,
+                StartTime.AddMinutes(10)));
+
+        var session = machine.CompleteCurrentPhase(StartTime.AddMinutes(10));
+
+        Assert.Equal(
+            new PomodoroSessionSnapshot(
+                PomodoroStatus.Running,
+                PomodoroPhaseType.LongBreak,
+                900,
+                0,
+                8,
+                null,
+                StartTime.AddMinutes(10),
+                StartTime.AddMinutes(10)),
+            session);
+        Assert.Equal(session, machine.Session);
+    }
+
+    [Fact]
     public void AdvanceTo_AutoStartDisabledStopsAtNextPhasePaused()
     {
         var machine = new PomodoroStateMachine(

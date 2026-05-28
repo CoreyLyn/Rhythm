@@ -101,6 +101,22 @@ public sealed class PomodoroStateMachine
         return Session;
     }
 
+    public PomodoroSessionSnapshot CompleteCurrentPhase(DateTimeOffset now)
+    {
+        if (Session.Status == PomodoroStatus.Idle)
+            return Session;
+
+        var session = Session;
+
+        if (session.Status == PomodoroStatus.Running)
+            session = AdvanceRunningSession(session, now);
+
+        var shouldRunNextPhase = session.Status == PomodoroStatus.Running && Config.AutoStartNextPhase;
+        var completedFocus = session.PhaseType == PomodoroPhaseType.Focus;
+        Session = CreateNextPhaseSession(session, now, completedFocus, shouldRunNextPhase);
+        return Session;
+    }
+
     private PomodoroSessionSnapshot AdvanceRunningSession(
         PomodoroSessionSnapshot session,
         DateTimeOffset now)

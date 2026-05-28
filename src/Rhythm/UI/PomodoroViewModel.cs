@@ -124,6 +124,8 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
 
     public bool CanSkip => !IsIdle;
 
+    public bool CanCompleteCurrentPhase => !IsIdle;
+
     public bool CanReset => !IsIdle || _machine.Session.CompletedFocusCountToday > 0;
 
     public string PrimaryActionText => IsRunning ? "暂停" : IsPaused ? "继续" : "开始";
@@ -193,6 +195,14 @@ public sealed class PomodoroViewModel : INotifyPropertyChanged
     {
         var previousSession = _machine.Session;
         _machine.SkipCurrentPhase(_nowProvider());
+        SyncSelectedLinkedItemIdFromSession();
+        PersistAndNotifyIfChanged(previousSession);
+    }
+
+    public void CompleteCurrentPhase()
+    {
+        var previousSession = _machine.Session;
+        _machine.CompleteCurrentPhase(_nowProvider());
         SyncSelectedLinkedItemIdFromSession();
         PersistAndNotifyIfChanged(previousSession);
     }

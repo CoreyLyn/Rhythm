@@ -224,10 +224,11 @@
                         <Button
                             Grid.Column="2"
                             HorizontalAlignment="Left"
-                            Click="OnPomodoroSkipClick"
+                            Click="OnPomodoroCompleteClick"
                             Content="›"
-                            IsEnabled="{Binding Pomodoro.CanSkip}"
-                            Style="{StaticResource PomodoroRoundButtonStyle}" />
+                            IsEnabled="{Binding Pomodoro.CanCompleteCurrentPhase}"
+                            Style="{StaticResource PomodoroRoundButtonStyle}"
+                            ToolTip="完成当前阶段" />
                     </Grid>
 
                     <Grid Grid.Row="3">

@@ -20,6 +20,7 @@ public partial class App : Application
     private TaskbarIcon? _trayIcon;
     private ContextMenu? _trayMenu;
     private MenuItem? _pomodoroActionMenuItem;
+    private MenuItem? _pomodoroCompleteMenuItem;
     private MenuItem? _pomodoroSkipMenuItem;
     private MenuItem? _pomodoroResetMenuItem;
     private MainViewModel? _viewModel;
@@ -85,6 +86,7 @@ public partial class App : Application
         var miEdit = new MenuItem { Header = "编辑事项..." };
         miEdit.Click += (_, _) => OpenEditItems();
         _pomodoroActionMenuItem = new MenuItem();
+        _pomodoroCompleteMenuItem = new MenuItem { Header = "完成当前阶段" };
         _pomodoroSkipMenuItem = new MenuItem { Header = "跳过当前阶段" };
         _pomodoroResetMenuItem = new MenuItem { Header = "重置番茄钟" };
         var miPomodoroSettings = new MenuItem { Header = "番茄钟设置..." };
@@ -96,6 +98,7 @@ public partial class App : Application
             RefreshAutostartMenuItem(miAutostart);
         };
         _pomodoroActionMenuItem.Click += (_, _) => ExecutePomodoroPrimaryAction();
+        _pomodoroCompleteMenuItem.Click += (_, _) => CompletePomodoroPhase();
         _pomodoroSkipMenuItem.Click += (_, _) => SkipPomodoroPhase();
         _pomodoroResetMenuItem.Click += (_, _) => ResetPomodoro();
         miPomodoroSettings.Click += (_, _) => OpenPomodoroSettings();
@@ -142,6 +145,7 @@ public partial class App : Application
         menu.Items.Add(miEdit);
         menu.Items.Add(new Separator());
         menu.Items.Add(_pomodoroActionMenuItem);
+        menu.Items.Add(_pomodoroCompleteMenuItem);
         menu.Items.Add(_pomodoroSkipMenuItem);
         menu.Items.Add(_pomodoroResetMenuItem);
         menu.Items.Add(miPomodoroSettings);
@@ -159,13 +163,14 @@ public partial class App : Application
 
     private void RefreshPomodoroMenuItems()
     {
-        if (_pomodoroActionMenuItem == null || _pomodoroSkipMenuItem == null || _pomodoroResetMenuItem == null)
+        if (_pomodoroActionMenuItem == null || _pomodoroCompleteMenuItem == null || _pomodoroSkipMenuItem == null || _pomodoroResetMenuItem == null)
             return;
 
         if (_viewModel == null)
         {
             _pomodoroActionMenuItem.Header = "开始专注";
             _pomodoroActionMenuItem.IsEnabled = false;
+            _pomodoroCompleteMenuItem.IsEnabled = false;
             _pomodoroSkipMenuItem.IsEnabled = false;
             _pomodoroResetMenuItem.IsEnabled = false;
             return;
@@ -188,6 +193,7 @@ public partial class App : Application
             _pomodoroActionMenuItem.IsEnabled = pomodoro.CanStartOrResume;
         }
 
+        _pomodoroCompleteMenuItem.IsEnabled = pomodoro.CanCompleteCurrentPhase;
         _pomodoroSkipMenuItem.IsEnabled = pomodoro.CanSkip;
         _pomodoroResetMenuItem.IsEnabled = pomodoro.CanReset;
     }
@@ -374,6 +380,14 @@ public partial class App : Application
         if (_viewModel == null || !_viewModel.Pomodoro.CanSkip) return;
 
         _viewModel.Pomodoro.SkipCurrentPhase();
+        SyncPomodoroState(showNotification: true);
+    }
+
+    private void CompletePomodoroPhase()
+    {
+        if (_viewModel == null || !_viewModel.Pomodoro.CanCompleteCurrentPhase) return;
+
+        _viewModel.Pomodoro.CompleteCurrentPhase();
         SyncPomodoroState(showNotification: true);
     }
 
