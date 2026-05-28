@@ -12,8 +12,8 @@
     WindowStyle="None">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="AboutSurfaceBrush" Color="#242426" />
-        <SolidColorBrush x:Key="AboutCardHoverBrush" Color="#343438" />
+        <SolidColorBrush x:Key="AboutSurfaceBrush" Color="#101720" />
+        <SolidColorBrush x:Key="AboutCardHoverBrush" Color="#1C2634" />
 
         <Style x:Key="AboutTextStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
@@ -60,12 +60,12 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="Background" Value="#2F9BFF" />
-                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#2F9BFF" />
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource PomodoroButtonHoverBrush}" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{StaticResource PomodoroButtonHoverBrush}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="Background" Value="#006EDB" />
-                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#006EDB" />
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource PomodoroButtonPressedBrush}" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{StaticResource PomodoroButtonPressedBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -152,6 +152,8 @@
                 Grid.Row="1"
                 Padding="14"
                 Background="{StaticResource AboutSurfaceBrush}"
+                BorderBrush="{StaticResource PomodoroCardBorderBrush}"
+                BorderThickness="1"
                 CornerRadius="10">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -165,6 +167,8 @@
                         Height="54"
                         Margin="0,0,14,0"
                         Background="{StaticResource CardBackgroundBrush}"
+                        BorderBrush="{StaticResource PomodoroCardBorderBrush}"
+                        BorderThickness="1"
                         CornerRadius="14">
                         <Image
                             Width="34"

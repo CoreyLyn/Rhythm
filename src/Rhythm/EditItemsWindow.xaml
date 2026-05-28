@@ -14,10 +14,10 @@
     WindowStyle="None">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="EditSurfaceBrush" Color="#242426" />
-        <SolidColorBrush x:Key="EditCardHoverBrush" Color="#343438" />
+        <SolidColorBrush x:Key="EditSurfaceBrush" Color="#101720" />
+        <SolidColorBrush x:Key="EditCardHoverBrush" Color="#1C2634" />
         <SolidColorBrush x:Key="EditDangerBrush" Color="#FF453A" />
-        <SolidColorBrush x:Key="EditInputBackgroundBrush" Color="#202022" />
+        <SolidColorBrush x:Key="EditInputBackgroundBrush" Color="#0F1620" />
 
         <Style x:Key="DialogTextStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
@@ -328,6 +328,8 @@
                 MinHeight="180"
                 Padding="10"
                 Background="{StaticResource EditSurfaceBrush}"
+                BorderBrush="{StaticResource PomodoroCardBorderBrush}"
+                BorderThickness="1"
                 CornerRadius="10">
                 <Grid>
                     <ListBox

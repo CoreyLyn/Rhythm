@@ -62,7 +62,7 @@ public partial class MainWindow : Window
         // Set border background based on transparency mode
         if (!_enableTransparency)
         {
-            SolidWindowChrome.Apply(this, RootBorder, 10);
+            SolidWindowChrome.Apply(this, RootBorder, RootBorder.CornerRadius.TopLeft);
 
             // Set context menu background
             if (RootBorder.ContextMenu != null)

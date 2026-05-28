@@ -14,9 +14,9 @@
     WindowStyle="None">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="SettingsSurfaceBrush" Color="#242426" />
-        <SolidColorBrush x:Key="SettingsCardHoverBrush" Color="#343438" />
-        <SolidColorBrush x:Key="SettingsInputBackgroundBrush" Color="#202022" />
+        <SolidColorBrush x:Key="SettingsSurfaceBrush" Color="#101720" />
+        <SolidColorBrush x:Key="SettingsCardHoverBrush" Color="#1C2634" />
+        <SolidColorBrush x:Key="SettingsInputBackgroundBrush" Color="#0F1620" />
 
         <Style x:Key="SettingsTextStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
@@ -223,6 +223,8 @@
                 Grid.Row="1"
                 Padding="14"
                 Background="{StaticResource SettingsSurfaceBrush}"
+                BorderBrush="{StaticResource PomodoroCardBorderBrush}"
+                BorderThickness="1"
                 CornerRadius="10">
                 <Grid>
                     <Grid.RowDefinitions>
